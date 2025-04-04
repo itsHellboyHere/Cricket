@@ -1,0 +1,38 @@
+.container {
+  position: relative;
+  width: 100%;
+  height: 50vh;
+  overflow: hidden;
+}
+
+.segment {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  grid-template-areas: 
+    "video1 video1 video1 video2 video2"
+    "video1 video1 video1 video2 video2";
+  /* grid-template-columns: 1fr 1fr 1fr 1fr; */
+  grid-template-rows: 1fr;
+  gap: 0;
+}
+
+.videoone {
+  grid-area: video1;
+  background-color: aliceblue;
+  position: relative;
+  overflow: hidden;
+}
+
+.videotwo {
+  grid-area: video2;
+  background-color: brown;
+  position: relative;
+  overflow: hidden;
+}
+
+.video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
