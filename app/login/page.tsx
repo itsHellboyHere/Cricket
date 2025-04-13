@@ -1,28 +1,81 @@
-import AcmeLogo from '../ui/acme-logo';
-import LoginForm from '../components/login-form';
+
 import { Suspense } from 'react';
-import { signIn } from '../../auth';
+
+import LoginOauth from '../components/LoginOauth';
+
+
+
 export default function LoginPage() {
   return (
-    <main className="flex items-center justify-center md:h-screen">
-      <div className="relative mx-auto flex w-full max-w-[400px] flex-col space-y-2.5 p-4 md:-mt-32">
-        <div className="flex h-20 w-full items-end rounded-lg bg-blue-500 p-3 md:h-36">
-          <div className="w-32 text-white md:w-36">
-            <AcmeLogo />
-          </div>
-        </div>
-        <Suspense>
-          <LoginForm />
-        </Suspense>
-         <form
-        action={async () => {
-          'use server';
-          await signIn('github', { redirectTo: '/posts' });
-        }}
-      >
-        <button type="submit">Sign in with GitHub</button>
-      </form>
-      </div>
-    </main>
+    <Suspense>
+    <LoginOauth/>
+    </Suspense>
+    // <main className="flex  items-center justify-center min-h-screen bg-gray-50">
+     
+    //   <div className="w-full max-w-md p-8  space-y-6 bg-white rounded-xl shadow-md">
+    //     <div className="flex flex-col items-center">
+    //       {/* <div className="mb-6">
+    //         <AcmeLogo />
+    //       </div> */}
+    //       <h1 className="text-2xl font-bold text-gray-900">Welcome back</h1>
+    //       <p className="text-gray-500">Sign in to your account</p>
+    //     </div>
+    //        <div className="grid grid-cols-2 gap-4">
+    //       <form
+    //         action={async () => {
+    //           'use server';
+    //           await signIn('github', { redirectTo: '/posts' });
+    //         }}
+    //         className="w-full"
+    //       >
+    //         <button
+    //           type="submit"
+    //           className="flex items-center justify-center w-full px-4 py-2 space-x-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+    //         >
+    //           <FaGithub className="w-5 h-5" />
+    //           <span>GitHub</span>
+    //         </button>
+    //       </form>
+
+    //       <form
+    //         action={async () => {
+    //           'use server';
+    //           await signIn('google', { redirectTo: '/posts' });
+    //         }}
+    //         className="w-full"
+    //       >
+    //         <button
+    //           type="submit"
+    //           className="flex items-center justify-center w-full px-4 py-2 space-x-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+    //         >
+    //           <FaGoogle className="w-5 h-5 text-red-500" />
+    //           <span>Google</span>
+    //         </button>
+    //       </form>
+    //     </div>
+    //        <div className="relative">
+    //       <div className="absolute inset-0 flex items-center">
+    //         <div className="w-full border-t border-gray-300"></div>
+    //       </div>
+    //       <div className="relative flex justify-center text-sm">
+    //         <span className="px-2 bg-white text-gray-500">OR LOG IN WITH YOUR EMAIL</span>
+    //       </div>
+    //     </div>
+    //     <Suspense>
+    //       <LoginForm />
+    //     </Suspense>
+
+     
+
+     
+
+    //     <div className="text-sm text-center text-gray-500">
+    //       Don't have an account?{' '}
+    //       <a href="#" className="font-medium text-blue-600 hover:text-blue-500">
+    //         Sign up
+    //       </a>
+    //     </div>
+    //   </div>
+    // </main>
   );
 }

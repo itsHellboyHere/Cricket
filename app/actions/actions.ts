@@ -9,6 +9,9 @@ import { signIn } from "../../auth";
 import { AuthError } from 'next-auth';
 import { auth } from "../../auth";
 import { CommentWithUser } from "../types";
+import { createUser, getUserByEmail } from "../lib/db-utils";
+import { hashPassword } from "../lib/auth-utils";
+import { error } from "console";
 
 
 export type State = {
@@ -20,36 +23,36 @@ export type State = {
   message?: string | null;
 };
 
-const FormSchema=z.object({
-title:z.string().min(1,"Title is required"),
-// content:z.string().min(1,"Content is required"),
-imageUrl: z.string().url("Please provide a valid image URL").or(z.literal("")),
+const FormSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  // content:z.string().min(1,"Content is required"),
+  imageUrl: z.string().url("Please provide a valid image URL").or(z.literal("")),
 
 })
-export async function createPost(prevState:State,formData:FormData){
-    const session= await auth()
-    if(!session?.user?.email){
-        return{
-          message:"Not authenticated"
-        }
+export async function createPost(prevState: State, formData: FormData) {
+  const session = await auth()
+  if (!session?.user?.email) {
+    return {
+      message: "Not authenticated"
     }
+  }
 
-    const rawData={
-        title: formData.get("title"),
-        // content:formData.get("content"), 
-        imageUrl:formData.get("imageUrl")
-    }
-   
-    const validation=FormSchema.safeParse(rawData)
-    if(!validation.success){
-      return {
+  const rawData = {
+    title: formData.get("title"),
+    // content:formData.get("content"), 
+    imageUrl: formData.get("imageUrl")
+  }
+
+  const validation = FormSchema.safeParse(rawData)
+  if (!validation.success) {
+    return {
       errors: validation.error.flatten().fieldErrors,
       message: "Validation failed. Please check your input.",
     };
-    
-    }
-    const validatedData = validation.data;
-     try {
+
+  }
+  const validatedData = validation.data;
+  try {
     // Generate unique slug
     let slug = validatedData.title.replace(/\s+/g, "-").toLowerCase();
     const originalSlug = slug;
@@ -75,32 +78,32 @@ export async function createPost(prevState:State,formData:FormData){
       },
     });
 
-  
+
   } catch (error) {
     console.error("Database Error:", error);
     return {
       message: "Database Error: Failed to create post.",
     };
   }
-    revalidatePath("/posts")
-    redirect("/posts")
+  revalidatePath("/posts")
+  redirect("/posts")
 }
 
-const UpadteFormSchema=z.object({
-title:z.string(),
+const UpadteFormSchema = z.object({
+  title: z.string(),
 
 })
-export async function updatePost(id:string,formData:FormData,){
-    const session = await auth()
-    if (!session?.user?.email) {
+export async function updatePost(id: string, formData: FormData,) {
+  const session = await auth()
+  if (!session?.user?.email) {
     throw new Error("Not authenticated");
   }
-    const rawData={
-        title:formData.get("title"),
-    }
+  const rawData = {
+    title: formData.get("title"),
+  }
 
-    const result= UpadteFormSchema.parse(rawData)
-    const post = await prisma.post.findUnique({
+  const result = UpadteFormSchema.parse(rawData)
+  const post = await prisma.post.findUnique({
     where: { id },
     select: {
       author: {
@@ -114,79 +117,145 @@ export async function updatePost(id:string,formData:FormData,){
   if (!post || post.author.email !== session.user.email) {
     throw new Error("Unauthorized: You can only edit your own posts");
   }
-    await prisma.post.update({
-        where:{id},
-        data:{
-            title:result.title,
-        }
-    })
-    revalidatePath("/posts")
-    redirect("/posts")
+  await prisma.post.update({
+    where: { id },
+    data: {
+      title: result.title,
+    }
+  })
+  revalidatePath("/posts")
+  redirect("/posts")
 }
-export async function deletePost(id:string){
-    // throw new Error('Failed to Delete Invoice');
-    await prisma.post.delete({
-        where:{id},
-    })
-    revalidatePath("/posts")
-    redirect("/posts")
+export async function deletePost(id: string) {
+  // throw new Error('Failed to Delete Invoice');
+  await prisma.post.delete({
+    where: { id },
+  })
+  revalidatePath("/posts")
+  redirect("/posts")
 }
 
 
 export async function authenticate(
-    prevState:string|undefined,
-    formData:FormData,
-){
-    try{
-        await signIn('credentials',formData);
-    }
-    catch(error){
-        if (error instanceof AuthError){
-            console.log(error)
-            switch (error.type){
-                case 'CredentialsSignin':
-                    return 'Invalid credentials.'
-                default:
-                    'Something went wrong.'
-            }
-        }
-        throw error
-    }
-}
-
-export async function toggleLike(postId:string){
-  const session= await auth()
-
-  if(!session?.user?.id) throw new Error("Not logged in")
-  
-    const existingLike= await prisma.like.findFirst({
-      where:{
-        userId:session.user.id,
-        postId
+  prevState: string | undefined,
+  formData: FormData,
+) {
+  try {
+    await signIn('credentials', formData);
+  }
+  catch (error) {
+    if (error instanceof AuthError) {
+      console.log(error)
+      switch (error.type) {
+        case 'CredentialsSignin':
+          return 'Invalid credentials.'
+        default:
+          'Something went wrong.'
       }
-    })
-    if(existingLike){
-      // Unlike
-      await prisma.like.delete({
-        where:{id:existingLike.id}
-      });
-      return{liked:false}
-    }else{
-      // Like
-      await prisma.like.create({
-        data:{
-          userId:session.user.id,
-          postId,
-        }
-      });
-      return {liked:true}
     }
+    throw error
+  }
+}
+const SignupSchema = z.object({
+  username:z.string().min(3,'Username is required'),
+  name: z.string().min(1, 'Name is required'),
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+});
+
+export async function signUp(prevState: any, formData: FormData) {
+  try {
+    const rawData = {
+      username:formData.get("username"),
+      email: formData.get("email"),
+      password: formData.get("password"),
+      name: formData.get("name"),
+    }
+    const validatedFields = SignupSchema.safeParse(rawData);
+
+    if (!validatedFields.success) {
+      return {
+        errors: validatedFields.error.flatten().fieldErrors,
+        message: 'Missing or invalid fields. Please check your input.',
+      };
+    }
+    const { username,name, email, password } = validatedFields.data;
+    const existingUser = await getUserByEmail(email);
+    if (existingUser) {
+      return {
+        errors: { email: ['Email already in use'] },
+        message: 'Email already in use',
+      };
+    }
+    const hashedPassword = await hashPassword(password);
+    const existingUsername = await prisma.user.findUnique({
+      where:{username}
+    })
+    if(existingUsername){
+      return{
+        errors:{username:['Username taken. Try another.']},
+        message:'Username already exists',
+      }
+    }
+    await createUser({username, email, password: hashedPassword, name })
+   
+
+      return { 
+        success:true,
+        credentials: { email, password }, 
+      errors: null, 
+      message:null,
+
+    };
+  }
+  catch (error) {
+    console.error('Signup error:', error);
+    if (error instanceof AuthError) {
+      return {
+        errors: null,
+        message: error.message,
+      };
+    }
+    return {
+      errors: null,
+      message: 'An error occurred during signup',
+    };
+  }
+}
+export async function signInWithGithub() {
+  await signIn('github', { redirectTo: '/posts' });
 }
 
+export async function signInWithGoogle() {
+  await signIn('google', { redirectTo: '/posts' });
+}
+export async function toggleLike(postId: string) {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("Not logged in");
+
+  const existingLike = await prisma.like.findFirst({
+    where: { userId: session.user.id, postId },
+  });
+
+
+  const liked = !existingLike;
+
+  if (existingLike) {
+    await prisma.like.delete({ where: { id: existingLike.id } });
+  } else {
+    await prisma.like.create({ data: { userId: session.user.id, postId } });
+  }
+
+
+  revalidatePath("/posts");
+  revalidatePath(`/posts/${postId}`);
+
+  return { liked };
+}
 export async function addComment(postId: string, content: string) {
   const session = await auth();
   if (!session?.user?.id) throw new Error("Not authenticated");
-  
+
   const newComment = await prisma.comment.create({
     data: {
       content,
@@ -206,7 +275,7 @@ export async function addComment(postId: string, content: string) {
 
   // revalidatePath(`/posts/${postId}`);
   revalidatePath(`/posts/${postId}`);
-  
+
   return newComment;
 }
 

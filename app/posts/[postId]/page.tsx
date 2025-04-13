@@ -6,6 +6,8 @@ import { deletePost } from "../../actions/actions";
 import Image from "next/image";
 import { HeartIcon, BookmarkIcon, EllipsisHorizontalIcon, ChatBubbleOvalLeftIcon, PencilSquareIcon, TrashIcon, ArrowLeftIcon } from "@heroicons/react/24/solid";
 import CommentSection from "@/app/components/CommentSection"
+import LikeButton from "@/app/components/LikeButton";
+import InteractivePostActions from "@/app/components/InteractivePostActions";
 
 
 export default async function PostPage({ params }: { params: { postId: string } }) {
@@ -80,18 +82,24 @@ export default async function PostPage({ params }: { params: { postId: string } 
           <div className="p-3">
             <div className="flex justify-between mb-2">
               <div className="flex space-x-4">
-                <button>
+                {/* <button>
                   <HeartIcon className={`h-6 w-6 ${isLiked ? 'text-red-500 fill-red-500' : ''}`} />
-                </button>
-                <button 
+                </button> */}
+                  <InteractivePostActions
+                        postId={post.id}
+                        initialLikes={post.likes.length}
+                        initialComments={post.comments.length}
+                        initialIsLiked={post.likes.some(like => like.userId === session?.user?.id)}
+                      />
+                {/* <button 
       className="p-1 hover:bg-gray-100 rounded-full"
     >
       <ChatBubbleOvalLeftIcon className="h-6 w-6" />
-    </button>
+    </button> */}
               </div>
               <BookmarkIcon className="h-6 w-6" />
             </div>
-            <p className="font-semibold text-sm">{post.likes.length} likes</p>
+            {/* <p className="font-semibold text-sm">{post.likes.length} likes</p> */}
             <p className="text-sm mt-1">
               <span className="font-semibold mr-2">{post.author.name}</span>
               {post.title}
@@ -208,21 +216,28 @@ export default async function PostPage({ params }: { params: { postId: string } 
             <div className="p-4 border-b">
               <div className="flex justify-between items-center">
                 <div className="flex items-center space-x-4">
-                  <button className="p-1 hover:bg-gray-100 rounded-full">
+                  {/* <button className="p-1 hover:bg-gray-100 rounded-full">
                     <HeartIcon className={`h-6 w-6 ${isLiked ? 'text-red-500 fill-red-500' : ''}`} />
-                  </button>
-                  <button 
+                  </button> */}
+                    <InteractivePostActions
+                          postId={post.id}
+                          initialLikes={post.likes.length}
+                          initialComments={post.comments.length}
+                          initialIsLiked={post.likes.some(like => like.userId === session?.user?.id)}
+                        />
+                  {/* <button 
       className="p-1 hover:bg-gray-100 rounded-full"
     >
       <ChatBubbleOvalLeftIcon className="h-6 w-6" />
-    </button>
+    </button> */}
                 </div>
                 <button className="p-1 hover:bg-gray-100 rounded-full">
                   <BookmarkIcon className="h-6 w-6" />
                 </button>
               </div>
               <p className="font-semibold text-sm mt-2">
-                {post.likes.length} {post.likes.length === 1 ? 'like' : 'likes'}
+                {/* {post.likes.length} {post.likes.length === 1 ? 'like' : 'likes'} */}
+               
               </p>
             </div>
 

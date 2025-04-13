@@ -29,7 +29,7 @@ export default function InteractivePostActions({
           <span>{initialComments}</span>
         </Link>
       </div>
-      <p className="text-sm font-semibold mb-2">{likeCount} likes</p>
+      {/* <p className="text-sm font-semibold mb-2">{likeCount}</p> */}
     </div>
   );
 }

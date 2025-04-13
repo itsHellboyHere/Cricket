@@ -1,44 +1,60 @@
-import { Prisma, PrismaClient } from '@prisma/client'
-import bcrypt from 'bcryptjs';
+// scripts/updateUsernames.ts
+import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
 async function main() {
-  console.log(`Start seeding...`);
+  const users = await prisma.user.findMany({
+    where: { username: null },
+    select: { id: true, email: true, name: true }
+  });
 
-  const hashedPassword = await bcrypt.hash('ahshshjjsk', 10);
-
-  const posts: Prisma.PostCreateInput[] = [
-    {
-      title: "Post 1",
-      slug: "post-1-2",
-      content: "This is my first Post.",
-      author: {
-        connectOrCreate: {
-          where: {
-            email: "john@gmail.com"
-          },
-          create: {
-            email: "john@gmail.com",
-            password: hashedPassword, 
-          },
-        }
-      }
+  for (const user of users) {
+    let username = '';
+    
+    if (user.email) {
+      // Generate from email
+      username = user.email.split('@')[0]
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, '_');
+    } else if (user.name) {
+      // Generate from name
+      username = user.name
+        .toLowerCase()
+        .replace(/\s+/g, '_')
+        .replace(/[^a-z0-9_]/g, '');
+    } else {
+      // Fallback to user ID
+      username = `user_${user.id.substring(0, 8)}`;
     }
-  ];
 
-  for (const post of posts) {
-    const newPost = await prisma.post.create({
-      data: post,
+    // Ensure uniqueness
+    let uniqueUsername = username;
+    let counter = 1;
+    
+    while (true) {
+      const exists = await prisma.user.findFirst({
+        where: { username: uniqueUsername }
+      });
+      
+      if (!exists) break;
+      uniqueUsername = `${username}_${counter++}`;
+    }
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { username: uniqueUsername }
     });
-    console.log(`Created post with id: ${newPost.id}`);
+    
+    console.log(`Updated ${user.email || user.id}: ${uniqueUsername}`);
   }
-
-  await prisma.$disconnect();
 }
 
-main().catch(async (e) => {
-  console.error(e);
-  await prisma.$disconnect();
-  process.exit(1);
-});
+main()
+  .catch(e => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });
