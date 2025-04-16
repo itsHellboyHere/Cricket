@@ -15,7 +15,7 @@ export default async function PostProfile({ post }: { post: PostWithRelations })
                             className="object-cover"
                             alt={post.title}
                             sizes="(max-width: 768px) 33vw, (max-width: 1200px) 25vw, 20vw"
-                            priority={false} // Consider setting this based on importance
+                            priority={false} 
                         />
                     </Link>
                     <div className={styles.hoverOverlay}>

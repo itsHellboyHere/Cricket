@@ -1,6 +1,6 @@
-import { User as PrismaUser } from "@prisma/client";
+import { User as PrismaUser , Account as PrismaAccount} from "@prisma/client";
 import { DefaultSession, DefaultUser } from "next-auth";
-import { AdapterUser as DefaultAdapterUser } from "next-auth/adapters";
+import { AdapterAccountType, AdapterUser as DefaultAdapterUser } from "next-auth/adapters";
 
 declare module "next-auth" {
   interface Session extends DefaultSession {
@@ -14,12 +14,14 @@ declare module "next-auth" {
   interface User extends DefaultUser {
     id: string;
     username?: string| null;
+    accounts?:PrismaAccount[];
   }
 }
 
 declare module "next-auth/adapters" {
   interface AdapterUser extends DefaultAdapterUser {
     username?: string;
+    
   }
 }
 

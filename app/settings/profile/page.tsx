@@ -12,8 +12,8 @@ export default  function ProfileSettingsPage(){
         <div className="max-w-2xl mx-auto py-12">
             <h1 className="text-3xl font-bold mb-8">Profile Settings</h1>
             <AvatarUpload
-            currentImage={session?.user?.image}
-            userId={session?.user?.id}
+            currentImage={session.user.image}
+            userId={session.user.id}
             />
         </div>
     )

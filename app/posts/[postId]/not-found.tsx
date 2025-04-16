@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-// app/posts/[slug]/not-found.tsx
+// app/posts/[postId]/not-found.tsx
 export default function NotFound() {
     return (
         <div className="flex flex-col items-center justify-center h-screen">

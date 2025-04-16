@@ -6,9 +6,9 @@ import { authConfig } from './auth.config';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
 import { prisma } from './app/lib/db';
-import { User as PrismaUser } from "@prisma/client";
+import { User as PrismaUser, Account as PrismaAccount } from "@prisma/client";
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import { AuthError } from 'next-auth';
+
 // Required for GitHub OAuth to work
 export const { handlers, auth, signIn, signOut  } = NextAuth({
   ...authConfig,
@@ -61,7 +61,19 @@ export const { handlers, auth, signIn, signOut  } = NextAuth({
     async signIn({ user, account }) {
       if (account?.provider !== 'credentials') {
         const email = user.email;
-        if (email && !user.username) {
+        if (email){
+          const existingUser = await prisma.user.findUnique({
+            where:{email},
+            include:{accounts:true}
+          }) as PrismaUser  & {accounts: PrismaAccount[]};
+          //  check user exits with different provider
+          console.log("error may get thrown")
+          if(existingUser?.accounts?.some(acc=> acc.provider !== account?.provider)){
+              // return to error page if account exist with different oauth provider
+               return `/auth/error?error=OAuthAccountNotLinked`
+          }
+        console.log("No error")
+        if (!user.username) {
           const prismaUser = user as unknown as PrismaUser;
           let baseUsername = email.split('@')[0].replace(/[^a-zA-Z0-9_]/g, '_');
           let username = baseUsername;
@@ -80,6 +92,7 @@ export const { handlers, auth, signIn, signOut  } = NextAuth({
           
           // Update the user object with the new username
           user.username = username;
+        }
         }
       }
       return true;

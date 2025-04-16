@@ -10,24 +10,24 @@ export default function LoginOauth(){
     const searchParams = useSearchParams()
       const error = searchParams.get('error');
 
-  useEffect(() => {
-    if (error === 'OAuthAccountNotLinked') {
-      toast.error(
-        'This email is already associated with another account. Please sign in with the original method or use a different email.',
-        { 
-          duration: 5000,
-          position: 'top-center',
-          style: {
-            background: '#fff',
-            color: '#333',
-            border: '1px solid #e5e7eb',
-            borderRadius: '10px',
-            padding: '16px',
-          },
-        }
-      );
-    }
-  }, [error]);
+  // useEffect(() => {
+  //   if (error === 'OAuthAccountNotLinked') {
+  //     toast.error(
+  //       'This email is already associated with another account. Please sign in with the original method or use a different email.',
+  //       { 
+  //         duration: 5000,
+  //         position: 'top-center',
+  //         style: {
+  //           background: '#fff',
+  //           color: '#333',
+  //           border: '1px solid #e5e7eb',
+  //           borderRadius: '10px',
+  //           padding: '16px',
+  //         },
+  //       }
+  //     );
+  //   }
+  // }, [error]);
     return(
         <main className="flex  items-center justify-center min-h-screen bg-gray-50">
              
