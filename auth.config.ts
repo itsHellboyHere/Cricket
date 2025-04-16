@@ -11,7 +11,7 @@ export const authConfig = {
       const isLoggedIn = auth?.user;
       // console.log(isLoggedIn)
       // const isPosts = nextUrl.pathname.startsWith('/posts');
-      const protectedRoutes = ['/posts', '/profile']
+      const protectedRoutes = ['/posts', '/profile','/settings']
       const isProtected = protectedRoutes.some((route) =>
         nextUrl.pathname.startsWith(route))
       const publicRoutes = ['/', '/about', '/news'];

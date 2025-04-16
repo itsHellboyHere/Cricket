@@ -8,8 +8,8 @@ export default function CricketSegment() {
         <div className={styles.segment}>
           <div className={styles.videoone}>
             <div className={styles.videoContainer}>
-              <video autoPlay muted loop playsInline className={styles.video}>
-                <source src="/cricket-highlights.mp4" type="video/mp4" />
+              <video autoPlay muted loop playsInline preload="auto" className={styles.video}>
+                <source src="https://res.cloudinary.com/dophafctu/video/upload/v1744656041/CrickStory/jbztcjc9rrzqlixjgcbg.mp4" type="video/mp4" />
               </video>
               <div className={styles.videoOverlay}>
                 <span className={styles.staticText}>Cricket </span>
@@ -21,7 +21,7 @@ export default function CricketSegment() {
           <div className={styles.videotwo}>
             <div className={styles.videoContainer}>
               <video autoPlay muted loop playsInline className={styles.video}>
-                <source src="/dhonisix.mp4" type="video/mp4" />
+                <source src="https://res.cloudinary.com/dophafctu/video/upload/v1744655996/CrickStory/z3l0t1wcme796qjfuzca.mp4" type="video/mp4" />
               </video>
               <div className={styles.videoOverlay}>
                 <span className={styles.staticText}>Cricket </span>

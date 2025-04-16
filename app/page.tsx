@@ -5,6 +5,7 @@ import HomeGridComponent from "./ui/HomeGridComponent";
 import HomeNavbar from "./components/HomeNavbar";
 import { Metadata } from "next";
 import Hero from "./ui/HeroComponent";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "CrickStory",
@@ -15,6 +16,7 @@ export default function Home() {
   return (
     <main>
       <HomeNavbar/>
+
       <Hero/>
       <HomeGridComponent/>
       <CricketSegment/>

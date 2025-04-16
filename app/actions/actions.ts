@@ -11,7 +11,7 @@ import { auth } from "../../auth";
 import { CommentWithUser } from "../types";
 import { createUser, getUserByEmail } from "../lib/db-utils";
 import { hashPassword } from "../lib/auth-utils";
-import { error } from "console";
+import { error, log } from "console";
 
 
 export type State = {
@@ -157,7 +157,7 @@ export async function authenticate(
   }
 }
 const SignupSchema = z.object({
-  username:z.string().min(3,'Username is required'),
+  username: z.string().min(3, 'Username is required'),
   name: z.string().min(1, 'Name is required'),
   email: z.string().email('Invalid email address'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
@@ -166,7 +166,7 @@ const SignupSchema = z.object({
 export async function signUp(prevState: any, formData: FormData) {
   try {
     const rawData = {
-      username:formData.get("username"),
+      username: formData.get("username"),
       email: formData.get("email"),
       password: formData.get("password"),
       name: formData.get("name"),
@@ -179,7 +179,7 @@ export async function signUp(prevState: any, formData: FormData) {
         message: 'Missing or invalid fields. Please check your input.',
       };
     }
-    const { username,name, email, password } = validatedFields.data;
+    const { username, name, email, password } = validatedFields.data;
     const existingUser = await getUserByEmail(email);
     if (existingUser) {
       return {
@@ -189,22 +189,22 @@ export async function signUp(prevState: any, formData: FormData) {
     }
     const hashedPassword = await hashPassword(password);
     const existingUsername = await prisma.user.findUnique({
-      where:{username}
+      where: { username }
     })
-    if(existingUsername){
-      return{
-        errors:{username:['Username taken. Try another.']},
-        message:'Username already exists',
+    if (existingUsername) {
+      return {
+        errors: { username: ['Username taken. Try another.'] },
+        message: 'Username already exists',
       }
     }
-    await createUser({username, email, password: hashedPassword, name })
-   
+    await createUser({ username, email, password: hashedPassword, name })
 
-      return { 
-        success:true,
-        credentials: { email, password }, 
-      errors: null, 
-      message:null,
+
+    return {
+      success: true,
+      credentials: { email, password },
+      errors: null,
+      message: null,
 
     };
   }
@@ -267,7 +267,8 @@ export async function addComment(postId: string, content: string) {
         select: {
           id: true,
           name: true,
-          image: true
+          image: true,
+          username: true,
         }
       }
     }
@@ -286,4 +287,37 @@ export async function getComments(postId: string): Promise<CommentWithUser[]> {
     orderBy: { createdAt: 'desc' }
   });
   return comments;
+}
+
+//  Update profile-pic image
+
+export async function updateProfilePicture(userId: any, imageUrl: string) {
+  const session = await auth()
+  console.log(userId,session?.user.id);
+  if (!session?.user || session.user.id !== userId) {
+    return {
+      success: false,
+      error: "Unauthorized",
+      status: 401
+    }
+  }
+
+  try {
+    // update database
+    await prisma.user.update({
+      where: { id: userId },
+      data: { image: imageUrl },
+    });
+
+    
+    return { success: true,status: 200 }
+  }
+  catch (error) {
+    console.error('Avatar update failed:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to update avatar",
+      status: 500
+    };
+  }
 }

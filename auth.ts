@@ -10,7 +10,7 @@ import { User as PrismaUser } from "@prisma/client";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { AuthError } from 'next-auth';
 // Required for GitHub OAuth to work
-export const { handlers, auth, signIn, signOut } = NextAuth({
+export const { handlers, auth, signIn, signOut  } = NextAuth({
   ...authConfig,
   adapter: PrismaAdapter(prisma),
   providers: [
@@ -84,20 +84,29 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
       return true;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user , trigger, session}) {
       if (user) {
         token.id = user.id;
         token.username = (user as unknown as PrismaUser).username;
+        token.image= (user as unknown as PrismaUser).image;
+      }
+      console.log("before trigger ",session) 
+      //  updates token when session is explicitly called 
+      if(trigger == "update" && session?.image){
+        console.log("after trigger ", session)
+        token.image= session.image 
       }
       return token;
     },
-    async session({ session, token }) {
+    async session({ session, token , trigger}) {
       if (session.user) {
+        
         session.user.id = token.id as string;
         session.user.username = token.username as string;
+        session.user.image= token.image as string;
       }
-      // console.log(session?.user)
+      // console.log(session?.user?.image)
       return session;
     },
   },
-});
+})

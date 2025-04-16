@@ -10,9 +10,9 @@ import LikeButton from "@/app/components/LikeButton";
 import InteractivePostActions from "@/app/components/InteractivePostActions";
 
 
-export default async function PostPage({ params }: { params: { postId: string } }) {
+export default async function PostPage(props:{params:Promise<{postId:string}>}) {
   const session = await auth();
-  const { postId } = params;
+  const { postId } = await props.params;
 
   const post = await prisma.post.findUnique({
     where: { id: postId },
@@ -37,9 +37,9 @@ export default async function PostPage({ params }: { params: { postId: string } 
  
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen ">
       {/* Mobile View - Single Column */}
-      <div className="md:hidden">
+      <div className="md:hidden mx-auto py-4 px-6">
         {/* Post Header */}
         <div className="bg-white p-3 border-b flex items-center sticky top-0 z-10">
           <Link href="/posts" className="mr-2">
@@ -51,7 +51,7 @@ export default async function PostPage({ params }: { params: { postId: string } 
         {/* Post Content */}
         <div className="bg-white mb-2">
           {/* Author Info */}
-          <div className="flex items-center p-3">
+          <div className="flex items-center p-3 ">
             <Image
               src={post.author.image || "/default-avatar.png"}
               width={32}
@@ -67,7 +67,7 @@ export default async function PostPage({ params }: { params: { postId: string } 
 
           {/* Post Image */}
           {post.imageUrl && (
-            <div className="relative aspect-square bg-gray-100">
+            <div className="relative aspect-square bg-gray-100 rounded">
               <Image
                 src={post.imageUrl}
                 fill
@@ -98,17 +98,33 @@ export default async function PostPage({ params }: { params: { postId: string } 
     </button> */}
               </div>
               <BookmarkIcon className="h-6 w-6" />
+              
             </div>
-            {/* <p className="font-semibold text-sm">{post.likes.length} likes</p> */}
-            <p className="text-sm mt-1">
-              <span className="font-semibold mr-2">{post.author.name}</span>
-              {post.title}
-            </p>
+            {/* Caption && date */}
+                   <div className="flex-1 mb-4">
+                {/* <p className="font-semibold">{post.author.name}</p> */}
+                <p className="text-gray-500 text-xs mb-4">
+                  {new Date(post.createdAt).toLocaleString()}
+                </p>
+                 <p className="text-sm whitespace-pre-line">
+                <span className="font-semibold mr-2">{post.author.username}</span>
+                {post.title}
+              </p>
+              </div>
           </div>
+         
+           {/* Caption */}
+            {/* <div className="border-b-2 mb-4">
+              <p className="text-sm whitespace-pre-line">
+                <span className="font-semibold mr-2">{post.author.username}</span>
+                {post.title}
+              </p>
+            </div> */}
         </div>
 
         {/* Full Comments Section */}
-        <div className="bg-white">
+        <div className="bg-white ">
+          {post.comments.length >0 &&(<p className="text-gray-500">Comments</p>)}
           <CommentSection 
             postId={postId} 
             initialComments={post.comments} 
@@ -118,9 +134,9 @@ export default async function PostPage({ params }: { params: { postId: string } 
 
         {/* Author Actions */}
         {isAuthor && (
-          <div className="flex gap-4 justify-center p-4 bg-white border-t sticky bottom-0 z-10">
+          <div className="flex gap-4  justify-center p-4 bg-white  sticky bottom-0 z-10">
             <Link 
-              href={`/posts/${post.slug}/edit`}
+              href={`/posts/${post.id}/edit`}
               className="flex items-center gap-1 text-blue-500"
             >
               <PencilSquareIcon className="h-5 w-5" />
@@ -140,7 +156,7 @@ export default async function PostPage({ params }: { params: { postId: string } 
       {/* Desktop View - Enhanced Split Screen */}
       <div className="hidden md:block">
         {/* Desktop Header */}
-        <div className="max-w-5xl mx-auto py-4 px-6 flex items-center border-b">
+        <div className="max-w-5xl mx-auto py-4 px-6 flex items-center ">
           <Link href="/posts" className="flex items-center text-blue-500 hover:text-blue-700">
             <ArrowLeftIcon className="h-5 w-5 mr-2" />
             <span className="font-medium">Back to Posts</span>
@@ -149,8 +165,8 @@ export default async function PostPage({ params }: { params: { postId: string } 
         </div>
 
         <div className="max-w-5xl mx-auto grid grid-cols-1 min-h-[calc(100vh-72px)]">
-          {/* Left Column - Post Image (Improved Centering) */}
-          <div className="bg-white flex items-center justify-center p-8 border-r border-l ">
+          {/* Left Column - Post Image  */}
+          <div className="bg-white flex items-center justify-center p-8 ">
             {post.imageUrl && (
               <div className="relative w-full max-w-lg aspect-square shadow-md rounded-lg overflow-hidden">
                 <Image
@@ -168,7 +184,7 @@ export default async function PostPage({ params }: { params: { postId: string } 
           {/* Right Column - Post Details & Comments */}
           <div className="bg-white flex flex-col h-full">
             {/* Post Header */}
-            <div className="p-4 border-b flex items-center">
+            <div className="p-4  flex items-center">
               <Image
                 src={post.author.image || "/default-avatar.png"}
                 width={40}
@@ -205,7 +221,7 @@ export default async function PostPage({ params }: { params: { postId: string } 
             </div>
 
             {/* Caption */}
-            <div className="p-4 border-b">
+            <div className="p-4 border-b-2">
               <p className="text-sm whitespace-pre-line">
                 <span className="font-semibold mr-2">{post.author.name}</span>
                 {post.title}
@@ -213,7 +229,7 @@ export default async function PostPage({ params }: { params: { postId: string } 
             </div>
 
             {/* Likes and Actions */}
-            <div className="p-4 border-b">
+            <div className="p-4 border-b-2 mb-2">
               <div className="flex justify-between items-center">
                 <div className="flex items-center space-x-4">
                   {/* <button className="p-1 hover:bg-gray-100 rounded-full">

@@ -3,7 +3,7 @@ import SideNav from '../ui/posts/sidenav';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Posts',
+  title: 'Settings',
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

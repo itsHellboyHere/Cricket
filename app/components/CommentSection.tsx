@@ -31,7 +31,7 @@ export default function CommentSection({
     <div>
       {displayedComments.map(comment => (
         <div key={comment.id} className="mb-2 text-sm">
-          <span className="font-semibold mr-2">{comment.user.name}</span>
+          <span className="font-medium mr-2 text-gray-700">{comment.user.username}</span>
           {comment.content}
         </div>
       ))}

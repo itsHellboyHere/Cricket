@@ -28,7 +28,8 @@ async function PostsList() {
         select: {
           id: true,
           name: true,
-          image: true
+          image: true,
+          username:true,
         }
       },
       likes: true,
@@ -40,7 +41,8 @@ async function PostsList() {
             select: {
               id: true,
               name: true,
-              image: true
+              image: true,
+              username:true,
             }
           }
         }
