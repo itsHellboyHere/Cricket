@@ -11,9 +11,9 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  username      String?   @unique
-  email         String?   @unique
+  id            String      @id @default(cuid())
+  username      String?     @unique
+  email         String?     @unique
   emailVerified DateTime?
   image         String?
   name          String?
@@ -23,19 +23,21 @@ model User {
   posts         Post[]
   Like          Like[]
   Comment       Comment[]
+  SavedPost     SavedPost[]
 }
 
 model Post {
-  id        String    @id @default(cuid())
+  id        String      @id @default(cuid())
   title     String
-  slug      String    @unique
+  slug      String      @unique
   imageUrl  String
-  author    User      @relation(fields: [authorId], references: [id])
+  author    User        @relation(fields: [authorId], references: [id])
   authorId  String
   likes     Like[]
   comments  Comment[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  savedBy   SavedPost[]
 
   @@index([slug, authorId])
 }
@@ -77,4 +79,15 @@ model Comment {
   post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId    String
   createdAt DateTime @default(now())
+}
+
+model SavedPost {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    String
+  createdAt DateTime @default(now())
+
+  @@unique([userId, postId])
 }

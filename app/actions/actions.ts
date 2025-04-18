@@ -321,3 +321,42 @@ export async function updateProfilePicture(userId: any, imageUrl: string) {
     };
   }
 }
+// save toggle action
+
+export async function toggleSave(userId:string, postId:string){
+  try{
+  // check for existing save
+   const existingSave = await prisma.savedPost.findUnique({
+    where: {
+      userId_postId: {
+        userId,
+        postId
+      }
+    }
+  })
+  if (existingSave){
+    // if exists unsave it from database
+    await prisma.savedPost.delete({
+      where:{
+        id:existingSave.id,
+      }
+    })
+  }else{
+    //  save it 
+    await prisma.savedPost.create({
+      data:{
+        userId,
+        postId,
+      }
+    })
+  }
+  revalidatePath("/posts")
+  revalidatePath(`/posts/${postId}`)
+  revalidatePath("/profile/saved")
+  return {success: true,saved:!existingSave}
+}
+catch(error){
+  console.log("Save error: ", error)
+  return {success:false}
+}
+}

@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import PostCard from "../components/PostCard";
 
 import styles from "../ui/post.module.css"
+import { auth } from "@/auth";
 function PostSkeleton({ count = 6 }: { count?: number }) {
   return (
     <>
@@ -21,7 +22,8 @@ function PostSkeleton({ count = 6 }: { count?: number }) {
     </>
   );
 }
-async function PostsList() {
+async function PostsList({ currentUserId }: { currentUserId?: string }) {
+  
   const posts = await prisma.post.findMany({
     include: {
       author: {
@@ -46,7 +48,8 @@ async function PostsList() {
             }
           }
         }
-      }
+      },
+      savedBy:true
     },
     orderBy: { createdAt: 'desc' }
   });
@@ -54,7 +57,7 @@ async function PostsList() {
   return (
     <>
       {posts.map(post => (
-        <PostCard key={post.id} post={post} />
+        <PostCard key={post.id} post={post}  currentUserId={currentUserId}  />
       ))}
     </>
   );
@@ -62,12 +65,13 @@ async function PostsList() {
 
 export default async function PostsPage() {
   const postCount = await prisma.post.count();
-  
+  const session = await auth()
+  // console.log('Session user ID:', session?.user?.id);
   return (
     <main className={styles.container}>
       {/* <h1 className="text-3xl font-semibold ">All Posts</h1> */}
       <Suspense fallback={<PostSkeleton count={postCount}/>}>
-            <PostsList />
+            <PostsList  currentUserId={session?.user?.id}/>
           
       </Suspense>
     </main>

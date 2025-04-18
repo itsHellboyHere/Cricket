@@ -21,7 +21,7 @@ export default function CricketSegment() {
           <div className={styles.videotwo}>
             <div className={styles.videoContainer}>
               <video autoPlay muted loop playsInline className={styles.video}>
-                <source src="https://res.cloudinary.com/dophafctu/video/upload/v1744655996/CrickStory/z3l0t1wcme796qjfuzca.mp4a" type="video/mp4" />
+                <source src="https://res.cloudinary.com/dophafctu/video/upload/v1744655996/CrickStory/z3l0t1wcme796qjfuzca.mp4" type="video/mp4" />
               </video>
               <div className={styles.videoOverlay}>
                 <span className={styles.staticText}>Cricket </span>

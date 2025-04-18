@@ -17,8 +17,8 @@ export default function InteractivePostActions({
   const [likeCount, setLikeCount] = useState(initialLikes);
   
   return (
-    <div className="p-4 ">
-      <div className="flex gap-4 mb-2">
+    <div className="p-2">
+      <div className="flex gap-3 mb-2">
         <LikeButton 
           postId={postId}
           initialLikes={initialLikes}

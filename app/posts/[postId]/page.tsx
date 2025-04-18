@@ -39,92 +39,100 @@ export default async function PostPage(props:{params:Promise<{postId:string}>}) 
   return (
     <main className="min-h-screen ">
       {/* Mobile View - Single Column */}
-      <div className="md:hidden mx-auto py-4 px-6">
+      <div className="md:hidden">
         {/* Post Header */}
-        <div className="bg-white p-3 border-b flex items-center sticky top-0 z-10">
-          <Link href="/posts" className="mr-2">
+        <div className="bg-white p-3 border-b flex items-center sticky top-0 z-10 backdrop-blur-sm ">
+          <Link href="/posts" className="mr-2 p-1 hover:bg-gray-100 rounded-full">
             <ArrowLeftIcon className="h-5 w-5" />
           </Link>
           <div className="flex-1 text-center font-semibold">Post</div>
         </div>
 
         {/* Post Content */}
-        <div className="bg-white mb-2">
-          {/* Author Info */}
-          <div className="flex items-center p-3 ">
-            <Image
-              src={post.author.image || "/default-avatar.png"}
-              width={32}
-              height={32}
-              className="rounded-full mr-3"
-              alt={post.author.name || "User"}
-            />
-            <div className="flex-1">
-              <p className="font-semibold">{post.author.name}</p>
+        <div className="bg-white mb-2 rounded-lg shadow-sm mx-2 mt-2">
+          {/* Author Info with Enhanced Avatar */}
+          <div className="flex items-center p-3">
+            <Link 
+              href={`/profile/${post.author.username}`}
+              className="group relative flex-shrink-0"
+            >
+              <div className="w-9 h-9 rounded-full overflow-hidden bg-gray-100 border border-gray-200">
+                <Image
+                  src={post.author.image || "/default-avatar.png"}
+                  width={40}
+                  height={40}
+                  className="border border-white w-full h-full object-cover"
+                  alt={post.author.name || "User"}
+                 
+                />
+              </div>
+              <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                View Profile
+              </span>
+            </Link>
+            <div className="flex-1 ml-3">
+              <Link 
+                href={`/profile/${post.author.username}`}
+                className="font-semibold hover:text-blue-500 transition-colors"
+              >
+                {post.author.username}
+              </Link>
+              <p className="text-gray-500 text-xs">
+                {new Date(post.createdAt).toLocaleDateString('en-US', {
+                  month: 'short',
+                  day: 'numeric',
+                
+                })}
+              </p>
             </div>
-            <EllipsisHorizontalIcon className="h-5 w-5" />
+            <button className="p-1 hover:bg-gray-100 rounded-full">
+              <EllipsisHorizontalIcon className="h-5 w-5" />
+            </button>
           </div>
 
           {/* Post Image */}
           {post.imageUrl && (
-            <div className="relative aspect-square bg-gray-100 rounded">
+            <div className="relative aspect-square bg-gray-100">
               <Image
                 src={post.imageUrl}
                 fill
                 className="object-cover"
                 alt={post.title}
                 sizes="100vw"
+                priority
               />
             </div>
           )}
 
           {/* Actions */}
-          <div className="p-3">
-            <div className="flex justify-between mb-2">
-              <div className="flex space-x-4">
-                {/* <button>
-                  <HeartIcon className={`h-6 w-6 ${isLiked ? 'text-red-500 fill-red-500' : ''}`} />
-                </button> */}
-                  <InteractivePostActions
-                        postId={post.id}
-                        initialLikes={post.likes.length}
-                        initialComments={post.comments.length}
-                        initialIsLiked={post.likes.some(like => like.userId === session?.user?.id)}
-                      />
-                {/* <button 
-      className="p-1 hover:bg-gray-100 rounded-full"
-    >
-      <ChatBubbleOvalLeftIcon className="h-6 w-6" />
-    </button> */}
-              </div>
-              <BookmarkIcon className="h-6 w-6" />
-              
-            </div>
-            {/* Caption && date */}
-                   <div className="flex-1 mb-4">
-                {/* <p className="font-semibold">{post.author.name}</p> */}
-                <p className="text-gray-500 text-xs mb-4">
-                  {new Date(post.createdAt).toLocaleString()}
-                </p>
-                 <p className="text-sm whitespace-pre-line">
-                <span className="font-semibold mr-2">{post.author.username}</span>
-                {post.title}
-              </p>
-              </div>
-          </div>
-         
-           {/* Caption */}
-            {/* <div className="border-b-2 mb-4">
+          <div className="p-4">
+            <InteractivePostActions
+              postId={post.id}
+              initialLikes={post.likes.length}
+              initialComments={post.comments.length}
+              initialIsLiked={post.likes.some(like => like.userId === session?.user?.id)}
+            />
+            
+            {/* Caption & Date */}
+            <div className="mt-2">
               <p className="text-sm whitespace-pre-line">
-                <span className="font-semibold mr-2">{post.author.username}</span>
+                <Link 
+                  href={`/profile/${post.author.username}`}
+                  className="font-semibold hover:text-blue-500 mr-2"
+                >
+                  {post.author.username}
+                </Link>
                 {post.title}
               </p>
-            </div> */}
+              <p className="text-gray-400 text-xs mt-2">
+                {new Date(post.createdAt).toLocaleString()}
+              </p>
+            </div>
+          </div>
         </div>
 
-        {/* Full Comments Section */}
-        <div className="bg-white ">
-          {post.comments.length >0 &&(<p className="text-gray-500">Comments</p>)}
+        {/* Comments Section */}
+        <div className="bg-white rounded-lg shadow-sm mx-2 mb-16">
           <CommentSection 
             postId={postId} 
             initialComments={post.comments} 
@@ -134,16 +142,15 @@ export default async function PostPage(props:{params:Promise<{postId:string}>}) 
 
         {/* Author Actions */}
         {isAuthor && (
-          <div className="flex gap-4  justify-center p-4 bg-white  sticky bottom-0 z-10">
+          <div className="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-center gap-6 p-3 z-20 shadow-lg">
             <Link 
               href={`/posts/${post.id}/edit`}
-              className="flex items-center gap-1 text-blue-500"
+              className="flex items-center gap-2 text-blue-500 hover:text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors"
             >
               <PencilSquareIcon className="h-5 w-5" />
               <span>Edit</span>
             </Link>
-            
-            <form action={deletePostWithId} className="flex items-center gap-1 text-red-500">
+            <form action={deletePostWithId} className="flex items-center gap-2 text-red-500 hover:text-red-700 px-4 py-2 rounded-lg hover:bg-red-50 transition-colors">
               <button type="submit">
                 <TrashIcon className="h-5 w-5" />
                 <span>Delete</span>

@@ -17,7 +17,7 @@ export default async function ProfilePage(props: { params: Promise<{ username: s
     const {username}= await props.params;
     // const username = params.username
     const session = await auth()
-    // console.log("session ", session?.user)
+    // console.log("session ", session?.user)s
     const user = await prisma.user.findUnique({
         where:{username},
         include:{
