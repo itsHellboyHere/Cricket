@@ -293,7 +293,7 @@ export async function getComments(postId: string): Promise<CommentWithUser[]> {
 
 export async function updateProfilePicture(userId: any, imageUrl: string) {
   const session = await auth()
-  console.log(userId,session?.user.id);
+  console.log(userId, session?.user.id);
   if (!session?.user || session.user.id !== userId) {
     return {
       success: false,
@@ -309,8 +309,8 @@ export async function updateProfilePicture(userId: any, imageUrl: string) {
       data: { image: imageUrl },
     });
 
-    
-    return { success: true,status: 200 }
+
+    return { success: true, status: 200 }
   }
   catch (error) {
     console.error('Avatar update failed:', error);
@@ -323,40 +323,37 @@ export async function updateProfilePicture(userId: any, imageUrl: string) {
 }
 // save toggle action
 
-export async function toggleSave(userId:string, postId:string){
-  try{
+export async function toggleSave(userId: string, postId: string) {
+
+
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("Not logged in");
   // check for existing save
-   const existingSave = await prisma.savedPost.findUnique({
+  const existingSave = await prisma.savedPost.findUnique({
     where: {
       userId_postId: {
         userId,
         postId
       }
     }
-  })
-  if (existingSave){
-    // if exists unsave it from database
+  });
+  const saved = !existingSave
+  if (existingSave) {
     await prisma.savedPost.delete({
-      where:{
-        id:existingSave.id,
+      where: {
+        id: existingSave.id
       }
     })
-  }else{
-    //  save it 
+  }
+  else {
     await prisma.savedPost.create({
-      data:{
-        userId,
-        postId,
+      data: {
+        userId: userId,
+        postId: postId
       }
     })
   }
   revalidatePath("/posts")
-  revalidatePath(`/posts/${postId}`)
-  revalidatePath("/profile/saved")
-  return {success: true,saved:!existingSave}
-}
-catch(error){
-  console.log("Save error: ", error)
-  return {success:false}
-}
+  revalidatePath(`/post/${postId}`)
+  return { saved }
 }

@@ -1,9 +1,11 @@
 'use client'
 
-import { useOptimistic, useTransition } from 'react'
+import { useTransition, useState } from "react";
 import { BookmarkIcon as BookmarkOutline } from '@heroicons/react/24/outline'
 import { BookmarkIcon as BookmarkSolid } from '@heroicons/react/24/solid'
 import { toggleSave } from '../actions/actions'
+import toast from "react-hot-toast";
+
 type SavePostButtonProps = {
   postId: string
   userId: string
@@ -15,21 +17,18 @@ export default function SavePostButton({
   userId,
   initiallySaved
 }: SavePostButtonProps) {
+  const [isSaved, setIsSaved] = useState(initiallySaved)
   const [isPending, startTransition] = useTransition()
-  const [optimisticSaved, addOptimisticSaved] = useOptimistic(
-    initiallySaved,
-    (_, newSaved:boolean) => newSaved
-  )
 
-  const handleClick = async () => {
+  const handleClick = () => {
     startTransition(async () => {
-
-      addOptimisticSaved(!optimisticSaved)
-      
-      // Real server action
-      const result = await toggleSave(userId, postId)
-      
-
+      try {
+        const result = await toggleSave(userId, postId)
+        setIsSaved(result.saved)
+        
+      } catch (error) {
+        toast.error("Failed to save the post")
+      }
     })
   }
 
@@ -37,20 +36,12 @@ export default function SavePostButton({
     <button
       onClick={handleClick}
       disabled={isPending}
-      className="p-2 rounded-full hover:bg-gray-100 relative"
-      aria-label={optimisticSaved ? "Unsave post" : "Save post"}
+      className="p-2 rounded-md hover:bg-gray-100 transition"
     >
-      {optimisticSaved ? (
-        <BookmarkSolid className="h-5 w-5 text-blue-500" />
+      {isSaved ? (
+        <BookmarkSolid className="w-6 h-6 text-blue-600" />
       ) : (
-        <BookmarkOutline className="h-5 w-5" />
-      )}
-      
-      {/* Loading spinner */}
-      {isPending && (
-        <span className="absolute inset-0 flex items-center justify-center">
-          <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-400"></span>
-        </span>
+        <BookmarkOutline className="w-6 h-6 text-gray-600" />
       )}
     </button>
   )

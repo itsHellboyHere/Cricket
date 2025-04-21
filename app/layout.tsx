@@ -28,6 +28,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <ThemeModeScript/>
+        
       </head>
       
       <body
