@@ -9,13 +9,13 @@ import styles from "../ui/post.module.css";
 import SavePostButton from "./SavePostButton";
 import { SavedPost } from "@prisma/client";
 
+
 export default async function PostCard({ post, currentUserId }: { 
   post: PostWithRelations,
   currentUserId?: string 
 }) {
-const savedBy: SavedPost[] = post.savedBy;
 const isSaved = currentUserId 
-  ? savedBy.some(save => save.userId === currentUserId)
+  ? post.savedBy?.some((save: SavedPost)=> save.userId === currentUserId)
   : false;
 //   console.log('Save button should render:', {
 //   hasUserId: Boolean(currentUserId),
