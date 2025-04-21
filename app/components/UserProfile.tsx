@@ -1,8 +1,10 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import styles from '../ui/HomeNavbar.module.css';
+import { User } from '@prisma/client';
 
-export function UserProfile({ user }: { user: any }) {
+
+export function UserProfile({ user }: { user:User }) {
   return (
     <div className={styles.userProfile}>
       <Link href="/profile" className={styles.profileLink}>

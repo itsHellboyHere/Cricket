@@ -28,7 +28,7 @@ console.log("error ",error)
       router.push('/login');
     }, 4000);
     return () => clearTimeout(timeout);
-  }, [error]);
+  }, [error,message]);
 
   return (
     <main className="flex items-center justify-center min-h-screen bg-gray-50 px-4">

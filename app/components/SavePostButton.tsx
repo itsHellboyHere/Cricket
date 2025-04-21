@@ -27,7 +27,7 @@ export default function SavePostButton({
         setIsSaved(result.saved)
         
       } catch (error) {
-        toast.error("Failed to save the post")
+        toast.error(error instanceof Error ? error.message:"Failed to save the post")
       }
     })
   }

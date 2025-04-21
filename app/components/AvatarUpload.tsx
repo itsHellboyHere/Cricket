@@ -1,9 +1,10 @@
 'use client'
 import { CldUploadButton } from 'next-cloudinary';
 import Image from 'next/image';
-import router from 'next/router';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import { CloudinaryUploadWidgetResults } from 'next-cloudinary';
+
 
 import { updateProfilePicture } from '../actions/actions';
 import { useSession } from 'next-auth/react';
@@ -18,13 +19,16 @@ export default function AvatarUpload({currentImage,
     
     const [isLoading, setIsLoading] = useState(false);
     const image = session?.user?.image || currentImage || "/default-avatar.png";
-    const handleSuccess = async (result: any) => {
+    const handleSuccess = async (result:CloudinaryUploadWidgetResults ) => {
 
         setIsLoading(true);
 
         try {
-            
-                  const imageUrl = `${result.info.secure_url}?t=${Date.now()}`;
+             const info = result.info;
+              if (typeof info !== 'object' || !('secure_url' in info)) {
+      throw new Error("Invalid upload result");
+    }
+                 const imageUrl = `${info.secure_url}?t=${Date.now()}`;
             const { success, error } = await updateProfilePicture(userId, imageUrl);
 
             if (!success) {

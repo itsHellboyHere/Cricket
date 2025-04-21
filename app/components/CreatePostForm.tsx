@@ -66,7 +66,7 @@ export default function CreatePostForm() {
         toast.error("Image size should be less than 8MB");
         return;
       }
-      setUploadedImageUrl(''); // Reset when new image selected
+      setUploadedImageUrl(''); 
       const reader = new FileReader();
       reader.onload = () => setImgSrc(reader.result?.toString() || '');
       reader.readAsDataURL(file);
@@ -88,7 +88,7 @@ export default function CreatePostForm() {
         socialFormats[selectedFormat].aspectRatio
       ));
     }
-  }, [selectedFormat]);
+  }, [selectedFormat,crop]);
 
   // Crop preview effect
   useEffect(() => {
@@ -153,11 +153,11 @@ export default function CreatePostForm() {
       // 4. Properly typed action call
       const result = await createPost(prevState, formData);
       return result;
-    } catch (error) {
+    } catch (err) {
       return {
         ...prevState,
         message: "Submission failed",
-        errors: { imageUrl: ["Failed to create post"] }
+        errors: { imageUrl: [err instanceof Error ?err.message:"Failed to Create Post"] }
       };
     }
   };

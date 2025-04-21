@@ -1,9 +1,9 @@
 'use client';
 import { usePathname } from 'next/navigation';
 import {
-  UserGroupIcon,
+ 
   HomeIcon,
-  DocumentDuplicateIcon,
+ 
   PlusIcon,
   UserIcon
 } from '@heroicons/react/24/outline';

@@ -1,17 +1,16 @@
 "use server"
 
 import { prisma } from "../lib/db"
-import { boolean, z } from 'zod';
+import {  z } from 'zod';
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { Prisma } from "@prisma/client";
 import { signIn } from "../../auth";
 import { AuthError } from 'next-auth';
 import { auth } from "../../auth";
 import { CommentWithUser } from "../types";
 import { createUser, getUserByEmail } from "../lib/db-utils";
 import { hashPassword } from "../lib/auth-utils";
-import { error, log } from "console";
+
 
 
 export type State = {
@@ -163,7 +162,24 @@ const SignupSchema = z.object({
   password: z.string().min(6, 'Password must be at least 6 characters'),
 });
 
-export async function signUp(prevState: any, formData: FormData) {
+
+export interface SignUpState {
+  errors?: {
+    username?: string[];
+    email?: string[];
+    password?: string[];
+    name?: string[];
+  };
+  message?: string | null;
+  success?:boolean;
+  credentials?:{
+    email:string;
+    password: string;
+  }
+  
+}
+
+export async function signUp(prevState: SignUpState, formData: FormData):Promise<SignUpState> {
   try {
     const rawData = {
       username: formData.get("username"),
@@ -177,6 +193,8 @@ export async function signUp(prevState: any, formData: FormData) {
       return {
         errors: validatedFields.error.flatten().fieldErrors,
         message: 'Missing or invalid fields. Please check your input.',
+        success:false,
+        credentials: undefined,
       };
     }
     const { username, name, email, password } = validatedFields.data;
@@ -185,6 +203,8 @@ export async function signUp(prevState: any, formData: FormData) {
       return {
         errors: { email: ['Email already in use'] },
         message: 'Email already in use',
+        success: false,
+        credentials: undefined,
       };
     }
     const hashedPassword = await hashPassword(password);
@@ -195,6 +215,8 @@ export async function signUp(prevState: any, formData: FormData) {
       return {
         errors: { username: ['Username taken. Try another.'] },
         message: 'Username already exists',
+        success: false,
+        credentials:undefined,
       }
     }
     await createUser({ username, email, password: hashedPassword, name })
@@ -203,22 +225,25 @@ export async function signUp(prevState: any, formData: FormData) {
     return {
       success: true,
       credentials: { email, password },
-      errors: null,
+      errors: undefined,
       message: null,
-
     };
   }
   catch (error) {
     console.error('Signup error:', error);
     if (error instanceof AuthError) {
       return {
-        errors: null,
-        message: error.message,
+        errors: undefined,
+           message: error.message,
+        success: false,
+        credentials: undefined
       };
     }
     return {
-      errors: null,
+    errors: undefined,
       message: 'An error occurred during signup',
+      success: false,
+      credentials: undefined
     };
   }
 }
@@ -291,7 +316,7 @@ export async function getComments(postId: string): Promise<CommentWithUser[]> {
 
 //  Update profile-pic image
 
-export async function updateProfilePicture(userId: any, imageUrl: string) {
+export async function updateProfilePicture(userId: string, imageUrl: string) {
   const session = await auth()
   console.log(userId, session?.user.id);
   if (!session?.user || session.user.id !== userId) {

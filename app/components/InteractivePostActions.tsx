@@ -14,7 +14,7 @@ export default function InteractivePostActions({
   initialComments: number;
   initialIsLiked:boolean;
 }) {
-  const [likeCount, setLikeCount] = useState(initialLikes);
+  
   
   return (
     <div className="p-2">

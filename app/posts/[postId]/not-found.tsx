@@ -1,12 +1,15 @@
 import Link from "next/link";
 
-// app/posts/[postId]/not-found.tsx
 export default function NotFound() {
     return (
         <div className="flex flex-col items-center justify-center h-screen">
             <h1 className="text-3xl font-semibold">Post Not Found</h1>
-            <p className="text-gray-600">The post you're looking for does not exist.</p>
-            <p><Link href='/posts' className="text-blue-600 mt-4 text-2xl hover:underline">Back Home</Link></p>
+            <p className="text-gray-600">The post you&apos;re looking for does not exist.</p>
+            <p>
+                <Link href="/posts" className="text-blue-600 mt-4 text-2xl hover:underline">
+                    Back Home
+                </Link>
+            </p>
         </div> 
     );
 }

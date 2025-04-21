@@ -1,14 +1,14 @@
 'use client'
-import { Suspense, useEffect } from "react";
+
 import LoginForm from "./login-form";
 import { signInWithGithub, signInWithGoogle } from "../actions/actions";
 import { FaGithub, FaGoogle } from "react-icons/fa";
-import { useSearchParams } from "next/navigation";
-import toast from "react-hot-toast";
+
+
 
 export default function LoginOauth(){
-    const searchParams = useSearchParams()
-      const error = searchParams.get('error');
+    // const searchParams = useSearchParams()
+      // const error = searchParams.get('error');
 
   // useEffect(() => {
   //   if (error === 'OAuthAccountNotLinked') {

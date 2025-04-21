@@ -4,9 +4,8 @@ import { notFound } from "next/navigation";
 import { auth } from "../../../auth";
 import { deletePost } from "../../actions/actions";
 import Image from "next/image";
-import { HeartIcon, BookmarkIcon, EllipsisHorizontalIcon, ChatBubbleOvalLeftIcon, PencilSquareIcon, TrashIcon, ArrowLeftIcon } from "@heroicons/react/24/solid";
+import { BookmarkIcon, EllipsisHorizontalIcon, PencilSquareIcon, TrashIcon, ArrowLeftIcon } from "@heroicons/react/24/solid";
 import CommentSection from "@/app/components/CommentSection"
-import LikeButton from "@/app/components/LikeButton";
 import InteractivePostActions from "@/app/components/InteractivePostActions";
 
 
@@ -33,7 +32,7 @@ export default async function PostPage(props:{params:Promise<{postId:string}>}) 
   const isAuthor = session?.user?.email === post.author.email;
 //   console.log(postId,post)
   const deletePostWithId = deletePost.bind(null, post.id);
-  const isLiked = post.likes.some(like => like.userId === session?.user?.id);
+  // const isLiked = post.likes.some(like => like.userId === session?.user?.id);
  
 
   return (

@@ -5,7 +5,6 @@ import styles from '../ui/HomeNavbar.module.css';
 import { UserProfile } from './UserProfile';
 import { AuthButtons } from './AuthButtons';
 import { MobileMenu } from './MobileMenu';
-import { useSession } from 'next-auth/react';
 import { auth } from '@/auth';
 
 const josef = Josefin_Sans({ subsets: ['latin'] });

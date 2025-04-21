@@ -2,7 +2,7 @@ import Image from "next/image";
 import InteractivePostActions from "./InteractivePostActions";
 import { PostWithRelations } from "../types";
 import Link from "next/link";
-import { auth } from "@/auth";
+
 import { EllipsisHorizontalIcon } from '@heroicons/react/24/outline';
 import { formatDistanceToNow } from 'date-fns';
 import styles from "../ui/post.module.css";
@@ -12,7 +12,7 @@ export default async function PostCard({ post, currentUserId }: {
   post: PostWithRelations,
   currentUserId?: string 
 }) {
-  const session = await auth();
+  
   const isSaved = currentUserId 
   ? post.savedBy?.some(save => save.userId === currentUserId) 
   : false;
