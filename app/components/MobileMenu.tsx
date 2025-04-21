@@ -5,9 +5,16 @@ import Link from 'next/link';
 import styles from '../ui/HomeNavbar.module.css';
 import { AuthButtonsMobile } from './AuthButtonsMobile';
 import { UserProfileMobile } from './UserProfileMobile';
-export function MobileMenu({ user }: { user?: any }) {
-  const [isOpen, setIsOpen] = useState(false);
+import { User } from 'next-auth';
 
+
+
+
+
+
+export function MobileMenu({ user }: { user?:User }) {
+  const [isOpen, setIsOpen] = useState(false);
+  
   return (
     <>
       <button 

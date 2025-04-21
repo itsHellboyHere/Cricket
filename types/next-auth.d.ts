@@ -32,3 +32,11 @@ declare module "next-auth/jwt" {
    image?:string;
   }
 }
+
+
+export type AuthUser = {
+  id: string;
+  username?: string | null;
+
+  image?: string | null;
+};

@@ -2,10 +2,10 @@ import { updatePost } from "../../../actions/actions"
 import { prisma } from "../../../lib/db"
 import { notFound, redirect } from "next/navigation"
 import { auth } from "../../../../auth"
-export default async function EditPostPage({params}:{params:{postId:string}}){
+export default async function EditPostPage(props:{params:Promise<{postId:string}>}){
     const session = await auth()
 
-    const postId=params.postId
+    const { postId } = await props.params;
     const post= await prisma.post.findUnique({
         where:{
             id:postId,

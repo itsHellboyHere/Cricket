@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { v2 as cloudinary } from 'cloudinary';
+import { v2 as cloudinary , UploadApiOptions} from 'cloudinary';
 import { auth } from "@/auth";
 
 interface CloudinaryUploadResult {
@@ -46,12 +46,13 @@ export async function POST(request: Request) {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    const uploadOptions: any = {
-      resource_type: 'image',
-      quality: 'auto:good',
-      fetch_format: 'auto',
-      folder: "posts-uploads"
-    };
+    const uploadOptions: UploadApiOptions = {
+  resource_type: 'image',
+  quality: 'auto:good',
+  fetch_format: 'auto',
+  folder: "posts-uploads"
+};
+
 
     // Apply transformation if format is provided
     if (format) {

@@ -11,6 +11,8 @@ const josef = Josefin_Sans({ subsets: ['latin'] });
 
 export default async function HomeNavbar() {
   const session = await auth()
+  // console.log('Session user ID:', session?.user?.id);
+  console.log('Session user:', session?.user);
   const user = session?.user;
   return (
     <nav className={`${styles.navbar} ${josef.className}`}>

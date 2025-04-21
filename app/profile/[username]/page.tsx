@@ -39,7 +39,8 @@ export default async function ProfilePage(props: { params: Promise<{ username: s
                    },
                    author:{
                     select:{username:true,name:true,image:true}
-                   }
+                   },
+                   savedBy:true
                 }
             }
         }
