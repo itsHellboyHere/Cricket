@@ -145,11 +145,10 @@ export async function authenticate(
   catch (error) {
     if (error instanceof AuthError) {
       console.log(error)
-      switch (error.type) {
-        case 'CredentialsSignin':
-          return 'Invalid credentials.'
-        default:
-          return 'Something went wrong.'
+      if (error.message === 'CredentialsSignin') {
+        return 'Invalid credentials.';
+      } else {
+        return 'Something went wrong.';
       }
     }
     throw error
