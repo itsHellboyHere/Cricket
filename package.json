@@ -4,11 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": " npm run db:deploy && next build",
+    "build": "  next build",
     "start": "next start",
     "lint": "next lint",
     "postinstall": "flowbite-react patch",
-    "db:deploy": "npx prisma migrate deploy && npx prisma generate"
+    "db:deploy": "npx prisma migrate deploy && npx prisma generate",
+    "vercel-build": "prisma generate && next build"
   },
   "prisma": {
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"

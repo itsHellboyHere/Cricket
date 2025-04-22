@@ -1,13 +1,16 @@
-FROM node:lts-alpine3.17
+FROM node:18-alpine
+WORKDIR /app
 
-WORKDIR /usr/src/app
-
+# Install dependencies (Prisma included)
 COPY package.json package-lock.json ./
-
 RUN npm ci
 
+# Copy app files (including Prisma schema)
 COPY . .
-# Build the Next.js app
+
+
+# Build Next.js (no DB needed here)
 RUN npm run build
 
-CMD ["sh", "-c", "npm run db:deploy && npm run dev"]
+# Run migrations + start app
+CMD ["sh", "-c", "npm run db:deploy && npm run start"]
