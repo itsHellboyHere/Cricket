@@ -6,6 +6,7 @@ import PostCard from "../components/PostCard";
 
 import styles from "../ui/post.module.css"
 import { auth } from "@/auth";
+import { PostWithRelations } from "../types";
 function PostSkeleton({ count = 6 }: { count?: number }) {
   return (
     <>
@@ -56,7 +57,7 @@ async function PostsList({ currentUserId }: { currentUserId?: string }) {
 
   return (
     <>
-      {posts.map(post => (
+      {posts.map((post:PostWithRelations) => (
         <PostCard key={post.id} post={post}  currentUserId={currentUserId}  />
       ))}
     </>

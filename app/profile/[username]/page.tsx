@@ -63,7 +63,7 @@ export default async function ProfilePage(props: { params: Promise<{ username: s
       <div className={styles.postGridWrap}>
         <h2 className={`${styles.sectionTitle} ${geistSans.variable}`}>Recent Posts</h2>
         <div className={styles.postGrid}>
-          {user.posts.map((post) => (
+          {user.posts.map((post:any) => (
             <PostProfile key={post.id} post={post} />
           ))}
         </div>

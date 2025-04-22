@@ -109,7 +109,7 @@ export default async function PostPage(props:{params:Promise<{postId:string}>}) 
               postId={post.id}
               initialLikes={post.likes.length}
               initialComments={post.comments.length}
-              initialIsLiked={post.likes.some(like => like.userId === session?.user?.id)}
+              initialIsLiked={post.likes.some((like:{userId:string}) => like.userId === session?.user?.id)}
             />
             
             {/* Caption & Date */}
@@ -245,7 +245,7 @@ export default async function PostPage(props:{params:Promise<{postId:string}>}) 
                           postId={post.id}
                           initialLikes={post.likes.length}
                           initialComments={post.comments.length}
-                          initialIsLiked={post.likes.some(like => like.userId === session?.user?.id)}
+                          initialIsLiked={post.likes.some((like:{userId:string}) => like.userId === session?.user?.id)}
                         />
                   {/* <button 
       className="p-1 hover:bg-gray-100 rounded-full"

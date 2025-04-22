@@ -1,13 +1,13 @@
 import Image from "next/image";
 import InteractivePostActions from "./InteractivePostActions";
-import { PostWithRelations } from "../types";
+import { CommentWithUser, PostWithRelations } from "../types";
 import Link from "next/link";
 
 import { EllipsisHorizontalIcon } from '@heroicons/react/24/outline';
 import { formatDistanceToNow } from 'date-fns';
 import styles from "../ui/post.module.css";
 import SavePostButton from "./SavePostButton";
-import { SavedPost } from "@prisma/client";
+
 
 
 export default async function PostCard({ post, currentUserId }: { 
@@ -15,7 +15,7 @@ export default async function PostCard({ post, currentUserId }: {
   currentUserId?: string 
 }) {
 const isSaved = currentUserId 
-  ? post.savedBy?.some((save: SavedPost)=> save.userId === currentUserId)
+  ? post.savedBy?.some((save: { userId: string }) => save.userId === currentUserId)
   : false;
 //   console.log('Save button should render:', {
 //   hasUserId: Boolean(currentUserId),
@@ -76,7 +76,7 @@ const isSaved = currentUserId
           postId={post.id}
           initialLikes={post.likes.length}
           initialComments={post.comments.length}
-          initialIsLiked={post.likes.some(like => like.userId === currentUserId)}
+          initialIsLiked={post.likes.some((like:{userId:string}) => like.userId === currentUserId)}
         />
         
         {currentUserId && (
@@ -114,7 +114,7 @@ const isSaved = currentUserId
             </>
           ) : (
             <div className="space-y-1">
-              {post.comments.map((comment) => (
+              {post.comments.map((comment:CommentWithUser) => (
                 <div key={comment.id} className="flex items-start text-sm">
                   <Link 
                     href={`/profile/${comment.user.username}`}

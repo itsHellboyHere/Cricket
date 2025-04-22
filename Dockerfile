@@ -1,27 +1,13 @@
-FROM node:18-alpine
+FROM node:lts-alpine3.17
 
-WORKDIR /app
+WORKDIR /usr/src/app
 
-# Install pnpm globally
-RUN npm install -g pnpm
+COPY package.json package-lock.json ./
 
-# Copy only the necessary files for dependency installation
-COPY package.json pnpm-lock.yaml ./
+RUN npm ci
 
-# Install dependencies
-RUN pnpm install
-
-# Now copy the rest of the project (without node_modules, thanks to .dockerignore)
 COPY . .
+# Build the Next.js app
+RUN npm run build
 
-# Build the project
-RUN pnpm run build
-
-# Set environment variables
-ENV NODE_ENV=production
-
-# Expose the app port
-EXPOSE 3000
-
-# Start the app
-CMD ["pnpm", "start"]
+CMD ["sh", "-c", "npm run db:deploy && npm run dev"]
