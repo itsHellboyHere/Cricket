@@ -88,7 +88,7 @@ export default function CreatePostForm() {
         socialFormats[selectedFormat].aspectRatio
       ));
     }
-  }, [selectedFormat,crop]);
+  }, [selectedFormat]);
 
   // Crop preview effect
   useEffect(() => {

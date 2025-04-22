@@ -1,16 +1,22 @@
-FROM node:18-alpine
-WORKDIR /app
+FROM node:lts-slim
 
-# Install dependencies (Prisma included)
+# Install openssl (required for Prisma)
+RUN apt-get update -y && apt-get install -y openssl
+
+WORKDIR /usr/src/app
+
+# Copy ONLY package files first (for better layer caching)
 COPY package.json package-lock.json ./
 RUN npm ci
 
-# Copy app files (including Prisma schema)
+# Copy Prisma schema and generate client
+COPY prisma ./prisma
+RUN npx prisma generate
+
+# Copy the rest of the app
 COPY . .
 
+# Build Next.js (if needed for production)
+# RUN npm run build
 
-# Build Next.js (no DB needed here)
-RUN npm run build
-
-# Run migrations + start app
-CMD ["sh", "-c", "npm run db:deploy && npm run start"]
+CMD ["sh", "-c", "npm run db:deploy && npm run dev"]

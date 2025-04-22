@@ -31,7 +31,7 @@ model Post {
   title     String
   slug      String      @unique
   imageUrl  String
-  author    User        @relation(fields: [authorId], references: [id])
+  author    User        @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId  String
   likes     Like[]
   comments  Comment[]
@@ -55,14 +55,14 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
-  user              User    @relation(fields: [userId], references: [id])
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
 
 model Like {
   id        String   @id @default(cuid())
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
   post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId    String
@@ -74,7 +74,7 @@ model Like {
 model Comment {
   id        String   @id @default(cuid())
   content   String
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
   post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId    String
@@ -83,7 +83,7 @@ model Comment {
 
 model SavedPost {
   id        String   @id @default(cuid())
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
   post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId    String

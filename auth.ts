@@ -58,50 +58,47 @@ export const { handlers, auth, signIn, signOut  } = NextAuth({
   session: { strategy: "jwt" },
   secret: process.env.NEXTAUTH_SECRET,
    callbacks: {
-    async signIn({ user, account }) {
-      if (account?.provider !== 'credentials') {
-        const email = user.email;
-        // check email is there and user-exist with that email or not.
-        if (email){
-          const existingUser = await prisma.user.findUnique({
-            where:{email},
-            include:{accounts:true}
-          }) as PrismaUser  & {accounts: PrismaAccount[]};
-          //  check user exits with different provider
-        
-          if(existingUser?.accounts?.some(acc=> acc.provider !== account?.provider)){
-              // return to error page if account exist with different oauth provider
-               return `/auth/error?error=OAuthAccountNotLinked`
-          }
-   
-        if (!user.username) {
-          const prismaUser = user as unknown as PrismaUser;
+   async signIn({ user, account }) {
+    if (account?.provider !== 'credentials') {
+      const email = user.email;
+      if (email) {
+        const existingUser = await prisma.user.findUnique({
+          where: { email },
+          include: { accounts: true }
+        }) as PrismaUser & { accounts: PrismaAccount[] };
+
+        // Check if user exists with different provider
+        if (existingUser?.accounts?.some(acc => acc.provider !== account?.provider)) {
+          return `/auth/error?error=OAuthAccountNotLinked`;
+        }
+
+        // Only proceed with username generation if user exists
+        if (existingUser && !existingUser.username) {
           let baseUsername = email.split('@')[0].replace(/[^a-zA-Z0-9_]/g, '_');
-          let username = baseUsername;
+        let username = baseUsername;
           let counter = 1;
           
           while (true) {
-            // check same username exits or not for uniqueness.
             const exists = await prisma.user.findUnique({ where: { username } });
-            // if duplicate username not found return no need to add extra chars to the username.
             if (!exists) break;
-            //  if duplicate found add the counter to it,
-            //  and increment the counter for future uniqueness.
             username = `${baseUsername}${counter++}`;
           }
-          // update the database with new username.
-          await prisma.user.update({
-            where: { id: prismaUser.id },
-            data: { username }
-          });
-          
-          // Update the user object with the new username
-          user.username = username;
-        }
+
+          try {
+            await prisma.user.update({
+              where: { id: existingUser.id },
+              data: { username }
+            });
+            user.username = username;
+          } catch (error) {
+            console.error('Failed to update username:', error);
+         
+          }
         }
       }
-      return true;
-    },
+    }
+    return true;
+  },
     async jwt({ token, user , trigger, session}) {
       if (user) {
         token.id = user.id;
