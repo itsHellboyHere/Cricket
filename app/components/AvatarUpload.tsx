@@ -10,40 +10,41 @@ import { updateProfilePicture } from '../actions/actions';
 import { useSession } from 'next-auth/react';
 
 
-export default function AvatarUpload({currentImage,
-  userId}:{
-    currentImage?:string | null;
-    userId:string;
-  }) {
-   const {update , data:session} = useSession();
-    
+export default function AvatarUpload() {
+    const { update, data: session } = useSession();
+
     const [isLoading, setIsLoading] = useState(false);
-    const image = session?.user?.image || currentImage || "/default-avatar.png";
-    const handleSuccess = async (result:CloudinaryUploadWidgetResults ) => {
+    const image = session?.user?.image || "/default-avatar.png";
+    const handleSuccess = async (result: CloudinaryUploadWidgetResults) => {
+    const userId = session?.user?.id;
+        if (!userId) {
+            toast.error('User ID not found');
+            return;
+        }
 
         setIsLoading(true);
 
         try {
-             const info = result.info;
-              if (typeof info !== 'object' || !('secure_url' in info)) {
-      throw new Error("Invalid upload result");
-    }
-                 const imageUrl = `${info.secure_url}?t=${Date.now()}`;
+            const info = result.info;
+            if (typeof info !== 'object' || !('secure_url' in info)) {
+                throw new Error("Invalid upload result");
+            }
+            const imageUrl = `${info.secure_url}?t=${Date.now()}`;
             const { success, error } = await updateProfilePicture(userId, imageUrl);
 
             if (!success) {
                 throw new Error(error || "Failed to update avatar");
             }
-          
-          
+
+
             toast.success('Avatar updated successfully!');
 
-            await update({image:imageUrl})
+            await update({ image: imageUrl })
             // router.refresh()
 
         } catch (err: unknown) {
-           const error = err instanceof Error ? err.message : "An unknown error occurred";
-      toast.error(error);
+            const error = err instanceof Error ? err.message : "An unknown error occurred";
+            toast.error(error);
         } finally {
             setIsLoading(false);
         }

@@ -7,6 +7,8 @@ import Image from "next/image";
 import { BookmarkIcon, EllipsisHorizontalIcon, PencilSquareIcon, TrashIcon, ArrowLeftIcon } from "@heroicons/react/24/solid";
 import CommentSection from "@/app/components/CommentSection"
 import InteractivePostActions from "@/app/components/InteractivePostActions";
+import PostModal from "@/app/components/PostModal";
+import SavePostButton from "@/app/components/SavePostButton";
 
 
 export default async function PostPage(props:{params:Promise<{postId:string}>}) {
@@ -23,7 +25,8 @@ export default async function PostPage(props:{params:Promise<{postId:string}>}) 
           user: true
         },
         orderBy: { createdAt: 'desc' }
-      }
+      },
+      savedBy: true
     }
   });
 
@@ -33,7 +36,7 @@ export default async function PostPage(props:{params:Promise<{postId:string}>}) 
 //   console.log(postId,post)
   const deletePostWithId = deletePost.bind(null, post.id);
   // const isLiked = post.likes.some(like => like.userId === session?.user?.id);
- 
+ const isSaved = post.savedBy.some((save:{userId:string})=> save.userId === session?.user?.id)
 
   return (
     <main className="min-h-screen ">
@@ -84,9 +87,9 @@ export default async function PostPage(props:{params:Promise<{postId:string}>}) 
                 })}
               </p>
             </div>
-            <button className="p-1 hover:bg-gray-100 rounded-full">
-              <EllipsisHorizontalIcon className="h-5 w-5" />
-            </button>
+            {isAuthor && <PostModal postId={post.id}/>}
+            
+          
           </div>
 
           {/* Post Image */}
@@ -111,7 +114,16 @@ export default async function PostPage(props:{params:Promise<{postId:string}>}) 
               initialComments={post.comments.length}
               initialIsLiked={post.likes.some((like:{userId:string}) => like.userId === session?.user?.id)}
             />
-            
+               <div className="flex justify-between items-center mt-2">
+              <p className="font-semibold text-sm">
+                {post.likes.length} {post.likes.length === 1 ? 'like' : 'likes'}
+              </p>  
+              { session?.user && (<SavePostButton
+              initiallySaved={isSaved}
+              postId={post.id}
+              userId={session?.user?.id}
+              />)}
+            </div>
             {/* Caption & Date */}
             <div className="mt-2">
               <p className="text-sm whitespace-pre-line">
@@ -127,7 +139,9 @@ export default async function PostPage(props:{params:Promise<{postId:string}>}) 
                 {new Date(post.createdAt).toLocaleString()}
               </p>
             </div>
+         
           </div>
+          
         </div>
 
         {/* Comments Section */}
@@ -140,8 +154,8 @@ export default async function PostPage(props:{params:Promise<{postId:string}>}) 
         </div>
 
         {/* Author Actions */}
-        {isAuthor && (
-          <div className="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-center gap-6 p-3 z-20 shadow-lg">
+        {/* {isAuthor && (
+          <div className=" bottom-0 left-0 right-0 bg-white border-t flex justify-center gap-6 p-3 z-20 shadow-lg">
             <Link 
               href={`/posts/${post.id}/edit`}
               className="flex items-center gap-2 text-blue-500 hover:text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors"
@@ -156,120 +170,126 @@ export default async function PostPage(props:{params:Promise<{postId:string}>}) 
               </button>
             </form>
           </div>
-        )}
+        )} */}
       </div>
 
-      {/* Desktop View - Enhanced Split Screen */}
-      <div className="hidden md:block">
-        {/* Desktop Header */}
-        <div className="max-w-5xl mx-auto py-4 px-6 flex items-center ">
-          <Link href="/posts" className="flex items-center text-blue-500 hover:text-blue-700">
-            <ArrowLeftIcon className="h-5 w-5 mr-2" />
-            <span className="font-medium">Back to Posts</span>
-          </Link>
-          <h1 className="text-xl font-semibold ml-6">Post Details</h1>
-        </div>
-
-        <div className="max-w-5xl mx-auto grid grid-cols-1 min-h-[calc(100vh-72px)]">
-          {/* Left Column - Post Image  */}
-          <div className="bg-white flex items-center justify-center p-8 ">
+     {/* Desktop View */}
+      <div className="hidden md:flex items-center justify-center min-h-screen p-4">
+        <div className="flex max-w-5xl w-full bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+          {/* Left Column - Fixed Height Image */}
+          <div className="flex-1 flex items-center  justify-center bg-black" style={{ maxHeight: '90vh' }}>
             {post.imageUrl && (
-              <div className="relative w-full max-w-lg aspect-square shadow-md rounded-lg overflow-hidden">
+              <div className="relative w-full h-full max-h-[90vh]">
                 <Image
                   src={post.imageUrl}
                   fill
-                  className="object-cover"
+                  className="object-contain"
                   alt={post.title}
-                  sizes="50vw"
+                  sizes="(max-width: 768px) 100vw, 50vw"
                   priority
                 />
               </div>
             )}
           </div>
 
-          {/* Right Column - Post Details & Comments */}
-          <div className="bg-white flex flex-col h-full">
-            {/* Post Header */}
-            <div className="p-4  flex items-center">
-              <Image
-                src={post.author.image || "/default-avatar.png"}
-                width={40}
-                height={40}
-                className="rounded-full mr-3"
-                alt={post.author.name || "User"}
-              />
-              <div className="flex-1">
-                <p className="font-semibold">{post.author.name}</p>
-                <p className="text-gray-500 text-xs">
-                  {new Date(post.createdAt).toLocaleString()}
-                </p>
-              </div>
+          {/* Right Column - Scrollable Content */}
+          <div className="flex-1 max-w-md flex flex-col border-l border-gray-200" style={{ maxHeight: '90vh' }}>
+            {/* Author Header (Fixed) */}
+            <div className="p-4 border-b border-gray-200 flex items-center">
+              <Link 
+                href={`/profile/${post.author.username}`}
+                className="flex items-center space-x-3 group"
+              >
+                <div className="w-10 h-10 rounded-full overflow-hidden border border-gray-200">
+                  <Image
+                    src={post.author.image || "/default-avatar.png"}
+                    width={40}
+                    height={40}
+                    className="object-cover w-full h-full"
+                    alt={post.author.name || "User"}
+                  />
+                </div>
+                <div>
+                  <p className="font-semibold group-hover:text-blue-500 transition-colors">
+                    {post.author.username}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {new Date(post.createdAt).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric'
+                    })}
+                  </p>
+                </div>
+              </Link>
               {isAuthor && (
-                <div className="flex gap-4">
-                  <Link 
-                    href={`/posts/${post.id}/edit`}
-                    className="text-blue-500 hover:text-blue-700"
-                    title="Edit Post"
-                  >
-                    <PencilSquareIcon className="h-5 w-5" />
-                  </Link>
-                  <form action={deletePostWithId}>
-                    <button 
-                      type="submit" 
-                      className="text-red-500 hover:text-red-700"
-                      title="Delete Post"
-                    >
-                      <TrashIcon className="h-5 w-5" />
-                    </button>
-                  </form>
+                <div className="ml-auto">
+                  <PostModal postId={post.id} />
                 </div>
               )}
             </div>
 
-            {/* Caption */}
-            <div className="p-4 border-b-2">
-              <p className="text-sm whitespace-pre-line">
-                <span className="font-semibold mr-2">{post.author.name}</span>
-                {post.title}
-              </p>
-            </div>
-
-            {/* Likes and Actions */}
-            <div className="p-4 border-b-2 mb-2">
-              <div className="flex justify-between items-center">
-                <div className="flex items-center space-x-4">
-                  {/* <button className="p-1 hover:bg-gray-100 rounded-full">
-                    <HeartIcon className={`h-6 w-6 ${isLiked ? 'text-red-500 fill-red-500' : ''}`} />
-                  </button> */}
-                    <InteractivePostActions
-                          postId={post.id}
-                          initialLikes={post.likes.length}
-                          initialComments={post.comments.length}
-                          initialIsLiked={post.likes.some((like:{userId:string}) => like.userId === session?.user?.id)}
-                        />
-                  {/* <button 
-      className="p-1 hover:bg-gray-100 rounded-full"
-    >
-      <ChatBubbleOvalLeftIcon className="h-6 w-6" />
-    </button> */}
+            {/* Scrollable Content Area */}
+            <div className="flex-1 overflow-y-auto p-4 ">
+              {/* Caption */}
+              <div className="border-b border-gray-300">
+                <div className="flex items-start space-x-3 mb-4 " >
+                  <Link 
+                    href={`/profile/${post.author.username}`}
+                    className="flex-shrink-0"
+                  >
+                    <div className="w-8 h-8 rounded-full overflow-hidden border border-gray-200">
+                      <Image
+                        src={post.author.image || "/default-avatar.png"}
+                        width={32}
+                        height={32}
+                        className="object-cover w-full h-full"
+                        alt={post.author.name || "User"}
+                      />
+                    </div>
+                  </Link>
+                  <div>
+                    <Link 
+                      href={`/profile/${post.author.username}`}
+                      className="font-semibold hover:text-blue-500 inline-block mr-2"
+                    >
+                      {post.author.username}
+                    </Link>
+                    <span className="text-sm whitespace-pre-line">{post.title}</span>
+                    {/* <p className="text-xs text-gray-400 mt-1">
+                      {new Date(post.createdAt).toLocaleString()}
+                    </p> */}
+                  </div>
                 </div>
-                <button className="p-1 hover:bg-gray-100 rounded-full">
-                  <BookmarkIcon className="h-6 w-6" />
-                </button>
               </div>
-              <p className="font-semibold text-sm mt-2">
-                {/* {post.likes.length} {post.likes.length === 1 ? 'like' : 'likes'} */}
-               
-              </p>
-            </div>
 
-            {/* Comments Section */}
-            <div className="flex-1 overflow-y-auto " id="comment-section">
+              {/* Comments Section */}
               <CommentSection 
                 postId={postId} 
                 initialComments={post.comments} 
                 showAll={true}
               />
+            </div>
+
+            {/* Fixed Action Bar */}
+            <div className="border-t border-gray-200 p-4 bg-white">
+              <div className="flex items-center justify-between mb-2">
+                <InteractivePostActions
+                  postId={post.id}
+                  initialLikes={post.likes.length}
+                  initialComments={post.comments.length}
+                  initialIsLiked={post.likes.some((like: {userId: string}) => like.userId === session?.user?.id)}
+                />
+                {session?.user && (
+                  <SavePostButton
+                    initiallySaved={isSaved}
+                    postId={post.id}
+                    userId={session.user.id}
+                  />
+                )}
+              </div>
+              <p className="font-semibold text-sm mb-3">
+                {post.likes.length} {post.likes.length === 1 ? 'like' : 'likes'}
+              </p>
             </div>
           </div>
         </div>

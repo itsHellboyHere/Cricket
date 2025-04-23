@@ -17,10 +17,7 @@ export default async function PostCard({ post, currentUserId }: {
 const isSaved = currentUserId 
   ? post.savedBy?.some((save: { userId: string }) => save.userId === currentUserId)
   : false;
-//   console.log('Save button should render:', {
-//   hasUserId: Boolean(currentUserId),
-//   isSaved
-// });
+
   return (
     <div className={styles.card}>
       <div className="flex flex-row bg-gray-100 px-4 py-2 items-center">

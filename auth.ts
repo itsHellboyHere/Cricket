@@ -10,11 +10,11 @@ import { User as PrismaUser, Account as PrismaAccount } from "@prisma/client";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 
 // Required for GitHub OAuth to work
-export const { handlers, auth, signIn, signOut  } = NextAuth({
+export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
   adapter: PrismaAdapter(prisma),
   providers: [
-      Google({
+    Google({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       authorization: {
@@ -30,7 +30,7 @@ export const { handlers, auth, signIn, signOut  } = NextAuth({
       clientId: process.env.GITHUB_CLIENT_ID,
       clientSecret: process.env.GITHUB_CLIENT_SECRET,
       authorization: {
-      params: {
+        params: {
           redirect_uri: `${process.env.NEXTAUTH_URL}/api/auth/callback/github`,
         },
       },
@@ -57,68 +57,73 @@ export const { handlers, auth, signIn, signOut  } = NextAuth({
   ],
   session: { strategy: "jwt" },
   secret: process.env.NEXTAUTH_SECRET,
-   callbacks: {
-   async signIn({ user, account }) {
-    if (account?.provider !== 'credentials') {
-      const email = user.email;
-      if (email) {
-        const existingUser = await prisma.user.findUnique({
-          where: { email },
-          include: { accounts: true }
-        }) as PrismaUser & { accounts: PrismaAccount[] };
+  callbacks: {
+    async signIn({ user, account }) {
+      if (account?.provider !== 'credentials') {
+        const email = user.email;
+        if (email) {
+          const existingUser = await prisma.user.findUnique({
+            where: { email },
+            include: { accounts: true }
+          }) as PrismaUser & { accounts: PrismaAccount[] };
 
-        // Check if user exists with different provider
-        if (existingUser?.accounts?.some(acc => acc.provider !== account?.provider)) {
-          return `/auth/error?error=OAuthAccountNotLinked`;
-        }
-
-        // Only proceed with username generation if user exists
-        if (existingUser && !existingUser.username) {
-          let baseUsername = email.split('@')[0].replace(/[^a-zA-Z0-9_]/g, '_');
-        let username = baseUsername;
-          let counter = 1;
-          
-          while (true) {
-            const exists = await prisma.user.findUnique({ where: { username } });
-            if (!exists) break;
-            username = `${baseUsername}${counter++}`;
+          // Check if user exists with different provider
+          if (existingUser?.accounts?.some(acc => acc.provider !== account?.provider)) {
+            return `/auth/error?error=OAuthAccountNotLinked`;
           }
 
-          try {
-            await prisma.user.update({
-              where: { id: existingUser.id },
-              data: { username }
-            });
-            user.username = username;
-          } catch (error) {
-            console.error('Failed to update username:', error);
-         
+          // Only proceed with username generation if user exists
+          if (existingUser && !existingUser.username) {
+            let baseUsername = email.split('@')[0].replace(/[^a-zA-Z0-9_]/g, '_');
+            let username = baseUsername;
+            let counter = 1;
+
+            while (true) {
+              const exists = await prisma.user.findUnique({ where: { username } });
+              if (!exists) break;
+              username = `${baseUsername}${counter++}`;
+            }
+
+            try {
+              await prisma.user.update({
+                where: { id: existingUser.id },
+                data: { username }
+              });
+              user.username = username;
+            } catch (error) {
+              console.error('Failed to update username:', error);
+
+            }
           }
         }
       }
-    }
-    return true;
-  },
-    async jwt({ token, user , trigger, session}) {
+      return true;
+    },
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id;
         token.username = (user as unknown as PrismaUser).username;
-        token.image= (user as unknown as PrismaUser).image;
+        token.image = (user as unknown as PrismaUser).image;
+        token.name = (user as unknown as PrismaUser).name;
+        token.bio= (user as unknown as PrismaUser).bio;
       }
       // console.log("before trigger ",session) 
       //  updates token when session is explicitly called 
-      if(trigger == "update" && session?.image){
+      if (trigger == "update" && session) {
         console.log("after trigger ", session)
-        token.image= session.image 
+        return {...token, ...session};
       }
       return token;
     },
-    async session({ session, token , trigger}) {
+    async session({ session, token, trigger }) {
       if (session.user) {
-        
+
         session.user.id = token.id as string;
         session.user.username = token.username as string;
-        session.user.image= token.image as string;
+        session.user.image = token.image as string;
+         session.user.name = token.name;
+        session.user.bio = token.bio as string;
+       
       }
       // console.log(session?.user?.image)
       return session;

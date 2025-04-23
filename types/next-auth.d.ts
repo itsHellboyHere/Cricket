@@ -7,7 +7,8 @@ declare module "next-auth" {
     user: {
       id: string;
       username?: string;
-     image?:string;
+     image?:string ;
+     bio?:string| null;
     } & DefaultSession["user"];
   }
 
@@ -15,13 +16,14 @@ declare module "next-auth" {
     id: string;
     username?: string| null;
     accounts?:PrismaAccount[]
+    bio?:string| null;
   }
 }
 
 declare module "next-auth/adapters" {
   interface AdapterUser extends DefaultAdapterUser {
     username?: string;
-    
+     bio?: string | null;
   }
 }
 
@@ -30,6 +32,7 @@ declare module "next-auth/jwt" {
     id: string;
     username?: string;
    image?:string;
+    bio?:string;
   }
 }
 

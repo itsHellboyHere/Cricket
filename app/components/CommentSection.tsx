@@ -29,7 +29,7 @@ export default function CommentSection({
   const displayedComments = showAll ? comments : comments.slice(0, 2);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 mt-4">
       {/* Comment Input */}
       <form onSubmit={handleSubmit} className="flex items-start gap-3">
         <div className="flex-shrink-0">

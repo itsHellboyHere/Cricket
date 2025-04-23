@@ -381,3 +381,99 @@ export async function toggleSave(userId: string, postId: string) {
   revalidatePath(`/post/${postId}`)
   return { saved }
 }
+
+//  update username and name and bio
+
+export type UpdateProfileState = {
+  errors?: {
+    username?: string[];
+    name?: string[];
+    bio?: string[];
+  };
+  message?: string | null;
+  success?: boolean;
+  updatedData?: {
+    username: string;
+    name: string;
+    bio?: string;
+  };
+}
+
+const ProfileInfoSchema = z.object({
+  username: z.string().min(3, 'Username must be at least 3 characters'),
+  name: z.string().min(1, 'Name is required'),
+  bio: z.string().optional(),
+})
+
+export async function updateProfileInfo(
+  userId: string,
+  prevState: UpdateProfileState,
+  formData: FormData
+): Promise<UpdateProfileState> {
+  const session = await auth()
+  
+  if (!session?.user || session.user.id !== userId) {
+    return {
+      success: false,
+      message: 'Unauthorized',
+      errors: {}
+    }
+  }
+
+  const rawData = {
+    username: formData.get('username'),
+    name: formData.get('name'),
+    bio: formData.get('bio'),
+  }
+
+  const validatedFields = ProfileInfoSchema.safeParse(rawData)
+  
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: 'Missing or invalid fields',
+      success: false,
+    }
+  }
+
+  const { username, name, bio } = validatedFields.data
+
+  try {
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        username: username,
+        NOT: { id: userId }
+      }
+    })
+
+    if (existingUser) {
+      return {
+        errors: { username: ['Username already taken'] },
+        message: 'Username already taken',
+        success: false,
+      }
+    }
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: { username, name, bio }
+    })
+
+    // revalidatePath(`/profile/${userId}`)
+    // revalidatePath(`/settings/profile`)
+
+    return {
+      success: true,
+      message: 'Profile updated successfully',
+      errors: {},
+      updatedData: { username, name, bio }
+    }
+  } catch (error) {
+    console.error('Profile update error:', error)
+    return {
+      success: false,
+      message: 'Database error: Failed to update profile',
+      errors: {},
+    }
+  }
+}
