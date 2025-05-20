@@ -7,7 +7,7 @@ export default function HomeGridComponent() {
             <div className={`${styles.item1} rounded-md `}>
                 
                 <Image
-                    src="/images/cover.png"
+                    src="https://res.cloudinary.com/dophafctu/image/upload/v1747720905/cover_uxvasy.png"
                     alt="Cricket action shot"
                     fill
                     className={`${styles.gridImage} z-[0]`}
@@ -19,7 +19,7 @@ export default function HomeGridComponent() {
             <div className={styles.item2}>
                 <button className={styles.buttonshine}> Explore</button>
                  <Image
-                    src="/images/kl-rahul.jpeg"
+                    src="https://res.cloudinary.com/dophafctu/image/upload/v1747720869/kl-rahul_fse8rp.jpg"
                     alt="Cricket action shot"
                     fill
                     className={`${styles.gridImage} z-[0]`}
@@ -37,7 +37,7 @@ export default function HomeGridComponent() {
                     className={styles.videoBackground}
                 >
 
-                    <source src="/crick-highlights/chennai-ipl.mp4" type="video/mp4" />
+                    <source src="https://res.cloudinary.com/dophafctu/video/upload/v1745492162/chennai-ipl_k9dqgx.mp4" type="video/mp4" />
                     {/* <source src="/videos/cricket-background.webm" type="video/webm" /> */}
 
                 </video>
@@ -48,7 +48,7 @@ export default function HomeGridComponent() {
             <div className={styles.item4}>
                 <button className={styles.buttonshine}># gods</button>
                 <Image
-                    src="/images/sachin.jpeg"
+                    src="https://res.cloudinary.com/dophafctu/image/upload/v1747715334/sachin_xjtptc.jpg"
                     alt="Cricket action shot"
                     fill
                     className={`${styles.gridImage} z-[0]`}
@@ -59,7 +59,7 @@ export default function HomeGridComponent() {
             <div className={styles.item5}>
                     
                   <Image
-                    src="/images/rohit-hitman.jpeg"
+                    src="https://res.cloudinary.com/dophafctu/image/upload/v1747715330/rohit-sharma2_tiqdge.jpg"
                     alt="Cricket action shot"
                     fill
                     className={`${styles.gridImage} z-[0]`}
@@ -70,7 +70,7 @@ export default function HomeGridComponent() {
             <div className={styles.item6}>
                 <button className={styles.buttonshine}># king</button>
                 <Image
-                    src="/images/virat-kohli.jpeg"
+                    src="https://res.cloudinary.com/dophafctu/image/upload/v1745492029/virat-kohli_n6aqjq.jpg"
                     alt="Cricket action shot"
                     fill
                     className={styles.gridImage}
@@ -88,7 +88,7 @@ export default function HomeGridComponent() {
             <div className={styles.item8}>
                  <button className={styles.buttonshine}>IPL</button>
                  <Image
-                    src="/images/Dharmshala.jpeg"
+                    src="https://res.cloudinary.com/dophafctu/image/upload/v1747720881/Dharmshala_ko5one.jpg"
                     alt="Cricket action shot"
                     fill
                     className={styles.gridImage}
@@ -103,7 +103,7 @@ export default function HomeGridComponent() {
             </div>
             <div className={`${styles.item9} `}>
                  <Image
-                    src="/images/bgt-1.jpeg"
+                    src="https://res.cloudinary.com/dophafctu/image/upload/v1747720869/kl-rahul_fse8rp.jpg"
                     alt="Cricket action shot"
                     fill
                     className={styles.gridImage}
@@ -132,7 +132,7 @@ export default function HomeGridComponent() {
                     className={styles.videoBackground}
                 >
 
-                    <source src="/crick-highlights/t20win.mp4" type="video/mp4" />
+                    <source src="https://res.cloudinary.com/dophafctu/video/upload/v1745492121/t20win_bsefew.mp4" type="video/mp4" />
                   
 
                 </video>

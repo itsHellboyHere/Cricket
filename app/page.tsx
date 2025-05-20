@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import CricketSegment from "./components/CricketSegment";
-import HomeGridComponent from "./ui/HomeGridComponent";
+import HomeGridComponent from "./components/HomeGridComponent";
 import HomeNavbar from "./components/HomeNavbar";
 import { Metadata } from "next";
 import Hero from "./ui/HeroComponent";
