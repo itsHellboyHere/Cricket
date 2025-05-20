@@ -39,7 +39,7 @@ export default function ProfileInfoForm() {
       }, 3000)
       return () => clearTimeout(timer)
     }
-  }, [state,update])
+  }, [state])
 
   
 

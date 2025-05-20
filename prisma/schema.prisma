@@ -24,6 +24,8 @@ model User {
   Like          Like[]
   Comment       Comment[]
   SavedPost     SavedPost[]
+  following     Follow[]    @relation("followers")
+  followers     Follow[]    @relation("following")
 }
 
 model Post {
@@ -90,4 +92,15 @@ model SavedPost {
   createdAt DateTime @default(now())
 
   @@unique([userId, postId])
+}
+
+model Follow {
+  id          String   @id @default(cuid())
+  follower    User     @relation(name: "followers", fields: [followerId], references: [id], onDelete: Cascade)
+  followerId  String
+  following   User     @relation(name: "following", fields: [followingId], references: [id], onDelete: Cascade)
+  followingId String
+  createdAt   DateTime @default(now())
+
+  @@unique([followerId, followingId])
 }

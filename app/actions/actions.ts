@@ -317,7 +317,7 @@ export async function getComments(postId: string): Promise<CommentWithUser[]> {
 
 export async function updateProfilePicture(userId: string, imageUrl: string) {
   const session = await auth()
-  console.log(userId, session?.user.id);
+  // console.log(userId, session?.user.id);
   if (!session?.user || session.user.id !== userId) {
     return {
       success: false,
@@ -476,4 +476,101 @@ export async function updateProfileInfo(
       errors: {},
     }
   }
+}
+
+export async function getFollowStatus(userId: string) {
+  const session = await auth();
+  if (!session?.user?.email) return false;
+
+  const currentUser = await prisma.user.findUnique({
+    where: { email: session.user.email },
+  });
+
+  if (!currentUser || userId === currentUser.id) return false;
+
+  const isFollowing = await prisma.follow.findUnique({
+    where: {
+      followerId_followingId: {
+        followerId: currentUser.id,
+        followingId: userId,
+      },
+    },
+  });
+
+  return !!isFollowing;
+}
+
+export async function toggleFollow(userId: string) {
+  const session = await auth();
+  if (!session?.user?.email) return { error: "Unauthorized" };
+
+  const currentUser = await prisma.user.findUnique({
+    where: { email: session.user.email },
+  });
+
+  if (!currentUser) return { error: "User not found" };
+  if (currentUser.id === userId) return { error: "Cannot follow yourself" };
+
+  const theFollowinguser = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+
+  if (!theFollowinguser) return { error: "User to follow not found" };
+
+  try {
+    const existingFollow = await prisma.follow.findUnique({
+      where: {
+        followerId_followingId: {
+          followerId: currentUser.id,
+          followingId: userId,
+        },
+      },
+    });
+
+    let isFollowing = false;
+
+    if (existingFollow) {
+      await prisma.follow.delete({
+        where: {
+          followerId_followingId: {
+            followerId: currentUser.id,
+            followingId: userId,
+          },
+        },
+      });
+    } else {
+      await prisma.follow.create({
+        data: {
+          followerId: currentUser.id,
+          followingId: userId,
+        },
+      });
+      isFollowing = true;
+    }
+
+ 
+    if (theFollowinguser.username) {
+      revalidatePath(`/profile/${theFollowinguser.username}`);
+    }
+
+    return { isFollowing };
+  } catch (error) {
+    console.error(error);
+    return { error: "Failed to toggle follow" };
+  }
+}
+// get total-followers count
+export async function getFollowersCount(userId: string) {
+  const count = await prisma.follow.count({
+    where: { followingId: userId }
+  });
+  
+  return count;
+}
+//  get total following count
+export async function getFollowingCount(userId: string) {
+  const count = await prisma.follow.count({
+    where: { followerId: userId }
+  });
+  return count;
 }

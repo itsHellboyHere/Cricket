@@ -10,7 +10,7 @@ import SavePostButton from "./SavePostButton";
 
 
 
-export default async function PostCard({ post, currentUserId }: { 
+export default  function PostCard({ post, currentUserId }: { 
   post: PostWithRelations,
   currentUserId?: string 
 }) {

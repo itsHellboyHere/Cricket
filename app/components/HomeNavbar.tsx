@@ -1,4 +1,4 @@
-
+'use client'
 import Link from 'next/link';
 import { Josefin_Sans } from 'next/font/google';
 import styles from '../ui/HomeNavbar.module.css';
@@ -6,11 +6,12 @@ import { UserProfile } from './UserProfile';
 import { AuthButtons } from './AuthButtons';
 import { MobileMenu } from './MobileMenu';
 import { auth } from '@/auth';
+import { useSession } from 'next-auth/react';
 
 const josef = Josefin_Sans({ subsets: ['latin'] });
 
-export default async function HomeNavbar() {
-  const session = await auth()
+export default  function HomeNavbar() {
+  const {data:session}= useSession();
   // console.log('Session user ID:', session?.user?.id);
   console.log('Session user:', session?.user);
   const user = session?.user;

@@ -3,7 +3,7 @@ import { PostWithRelations } from "../types";
 import styles from "../ui/Postprofile.module.css"
 import Image from "next/image";
 
-export default async function PostProfile({ post }: { post: PostWithRelations }) {
+export default  function PostProfile({ post }: { post: PostWithRelations }) {
     return (
         <div className={styles.card}>
             {post.imageUrl && (

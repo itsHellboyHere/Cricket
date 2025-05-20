@@ -6,11 +6,11 @@
     max-width: 64rem;
 }
 
-.editButtonWrap {
+/* .editButtonWrap,.followButtonWrap {
     margin-top: 1rem;
     margin-bottom: 2.5rem;
     padding-left: 8px;
-}
+} */
 
 .postGridWrap {
     display: flex;
@@ -83,3 +83,33 @@
         padding: 2rem 4rem;
     } */
 }
+
+/* Follow stats styling */
+.followStats {
+    display: flex;
+    gap: 2rem;
+    margin: 1rem 0;
+  }
+  
+  .followStat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .followCount {
+    font-weight: bold;
+    font-size: 1.2rem;
+  }
+  
+  .followLabel {
+    font-size: 0.9rem;
+    color: #666;
+  }
+  
+  /* Button container styling */
+  /* .followButtonWrap, .editButtonWrap {
+    margin: 1rem 0;
+    display: flex;
+    justify-content: center;
+  } */

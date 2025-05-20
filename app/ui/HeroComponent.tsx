@@ -7,11 +7,11 @@ import { useEffect, useState } from 'react';
 
 
 const backgroundImages = [
-  '/images/stadium.jpeg',
-  '/images/team-blue.jpeg',
-  '/images/virat-drive.jpeg',
-  '/images/bgt-test.jpeg',
-  '/images/ben-stokes.jpeg',
+  "https://res.cloudinary.com/dophafctu/image/upload/w_1000,ar_16:9,c_fill,g_auto,e_sharpen/v1745492039/virat-drive_tipale.jpg",
+  "https://res.cloudinary.com/dophafctu/image/upload/v1745491983/bgt-test_kjv2ti.jpg",
+  "https://res.cloudinary.com/dophafctu/image/upload/w_1000,ar_1:1,c_fill,g_auto,e_art:hokusai/v1745492059/team-blue_klx6gw.jpg",
+  "https://res.cloudinary.com/dophafctu/image/upload/v1745491975/ben-stokes_qcxh3u.jpg" ,
+  "https://res.cloudinary.com/dophafctu/image/upload/v1745492471/kl-stadium_jurse9.jpg"
   
 ];
 export default function Hero() {
